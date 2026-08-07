@@ -1,0 +1,24 @@
+/**
+ * The absolute public origin of this deployment.
+ *
+ * Every other URL on the site is relative, deliberately. This exists for the
+ * places that cannot be: metadataBase, the canonical tag, and the OG image URL
+ * a scraper needs to resolve. All are read outside the request that produced
+ * them, so a relative path has nothing to resolve against.
+ *
+ * It must come from configuration rather than the incoming request. Behind a
+ * reverse proxy in a container the request's own origin is
+ * `http://localhost:3000` — correct from inside the container, useless to a
+ * crawler, and the sort of bug that only shows up in production because it is
+ * right on a laptop.
+ *
+ * aimtp.2600i.com is canonical. aimtp.net is a separate question and is
+ * deliberately not referenced here — see README.
+ */
+const FALLBACK = "http://localhost:3000";
+
+/** Trailing slashes are stripped so callers can always write `${siteUrl()}/path`. */
+export function siteUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  return (configured || FALLBACK).replace(/\/+$/, "");
+}

@@ -1,0 +1,1228 @@
+@import "tailwindcss";
+
+html {
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------------------
+   Palette — AIMTP
+   The token *names* are the ones every 2600i property uses (obsidian, graphite,
+   carbon, signal, mist, slate, ion, cyan, amber, green, red). That shared
+   vocabulary is the design system; each property re-pigments it. The sibling
+   homeschool site warms it toward dusk. AIMTP cools it back to the parent
+   site's near-black, because this is developer infrastructure and it should
+   read as instrument panel rather than evening light.
+
+   --color-accent is the one colour in the 2600i mark: the dot on the "i".
+   Using it as the primary accent is what ties this site to the parent brand
+   without introducing a single new brand element.
+--------------------------------------------------------------------------- */
+:root {
+  --color-obsidian: #050608; /* page base — cold near-black */
+  --color-graphite: #0c0f14;
+  --color-carbon: #12171e; /* cards, wells, code */
+  --color-signal: #f5f7fa;
+  --color-mist: #a7b0bc;
+  --color-slate: #747c88;
+  --color-ion: #4da3ff;
+  --color-cyan: #5ff4ff;
+
+  /* verdict pigments — ALLOW / REQUIRE_APPROVAL / DENY */
+  --color-green: #48d597;
+  --color-amber: #ffb547;
+  --color-red: #ff5c6c;
+
+  /* the accent on the "i" in the 2600i mark */
+  --color-accent: #0095fa;
+
+  --background: var(--color-obsidian);
+  --foreground: var(--color-signal);
+
+  /* spacex.com geometry constants, as measured at 1440x900 for the sibling
+     site and carried over unchanged — this is the proportion system, not a
+     re-derivation */
+  --sx-gutter: 60px;
+  --sx-header-h: 74px;
+  --sx-section-h: 941px;
+  --sx-block-w: 450px;
+  --sx-copy-w: 416px;
+  --sx-ease: cubic-bezier(0.4, 0.01, 0.16, 1);
+
+  --rule: rgba(245, 247, 250, 0.12);
+  --rule-soft: rgba(245, 247, 250, 0.07);
+}
+
+@theme inline {
+  --color-obsidian: var(--color-obsidian);
+  --color-graphite: var(--color-graphite);
+  --color-carbon: var(--color-carbon);
+  --color-signal: var(--color-signal);
+  --color-mist: var(--color-mist);
+  --color-slate: var(--color-slate);
+  --color-ion: var(--color-ion);
+  --color-cyan: var(--color-cyan);
+  --color-amber: var(--color-amber);
+  --color-green: var(--color-green);
+  --color-red: var(--color-red);
+  --color-accent: var(--color-accent);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-signal);
+}
+
+/* ===========================================================================
+   MARKETING SHELL — spacex.com geometry, AIMTP subject
+=========================================================================== */
+
+.sx {
+  position: relative;
+  --sx-fg: var(--color-signal);
+  background: var(--color-obsidian);
+}
+
+/* --- header --------------------------------------------------------------- */
+.sx-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: var(--sx-header-h);
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  color: var(--sx-fg);
+}
+
+.sx-header-backdrop {
+  position: absolute;
+  inset: 0;
+  height: 0;
+  background: rgba(5, 6, 8, 0.92);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.4s var(--sx-ease),
+    height 0.4s var(--sx-ease);
+}
+
+.sx-header:has(.sx-nav-item--menu:hover) .sx-header-backdrop,
+.sx-header:has(.sx-nav-item--menu:focus-within) .sx-header-backdrop {
+  opacity: 1;
+  height: 232px;
+}
+
+.sx-logo {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  flex: none;
+  margin-right: 44px;
+  color: var(--sx-fg);
+}
+
+/*
+ * Sized by height, because that is what the bar constrains; width follows the
+ * mark's own 5.4:1. This is the shared 2600i mark with its sub-brand line
+ * removed — see scripts/build-brand-assets.mjs.
+ */
+.sx-mark {
+  display: block;
+  width: auto;
+  height: 21px;
+  transition: opacity 0.3s var(--sx-ease);
+}
+
+.sx-logo:hover .sx-mark {
+  opacity: 0.82;
+}
+
+/*
+ * "AIMTP" is live text, not artwork. It sits where "HOMESCHOOL" sits on the
+ * sibling site — the sub-brand slot under/beside the numerals — and borrows
+ * that line's manner: uppercase, widely tracked, set much smaller than the
+ * mark. Live type stays sharp at any size, is selectable and readable aloud,
+ * and needs no re-export to restyle.
+ */
+.sx-subbrand {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  /* tracking hangs after the final glyph; pull the box back in */
+  margin-right: -0.3em;
+}
+
+.sx-nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: var(--sx-header-h);
+  margin-right: 28px;
+}
+
+.sx-nav-item {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.sx-nav-link {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--sx-fg);
+  opacity: 0.85;
+  transition: opacity 0.3s var(--sx-ease);
+}
+
+.sx-nav-link:hover {
+  opacity: 1;
+}
+
+.sx-nav-spacer {
+  margin-left: auto;
+}
+
+/*
+ * Status, stated plainly. This is a developer preview and the wire version is
+ * frozen — both are true, and saying so is what keeps the rest of the page
+ * from having to imply a maturity it does not have.
+ */
+.sx-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 26px;
+  padding: 0 11px;
+  border: 1px solid var(--rule);
+  border-radius: 13px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-mist);
+  white-space: nowrap;
+  /* the hero's key field runs behind this corner; without a scrim the chip
+     competes with the artwork instead of sitting on top of it */
+  background: rgba(5, 6, 8, 0.62);
+  backdrop-filter: blur(6px);
+}
+
+.sx-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 149, 250, 0.16);
+}
+
+/* --- sections ------------------------------------------------------------- */
+.sx-section {
+  position: relative;
+  width: 100%;
+  min-height: var(--sx-section-h);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/*
+ * The hero is its own containing block. Without position/overflow here the
+ * absolutely-positioned .scene inside it resolves against .sx instead — which
+ * is the whole document — and the backdrop is stretched over the full page
+ * height rather than the viewport.
+ */
+.sx-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sx-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 0 var(--sx-gutter);
+}
+
+.sx-hero .sx-inner {
+  padding-bottom: 135px;
+}
+
+.sx-block {
+  width: var(--sx-block-w);
+  max-width: 100%;
+}
+
+/* the hero headline runs wider than section blocks, as on spacex.com */
+.sx-hero .sx-block {
+  width: 760px;
+}
+
+.sx-section--right .sx-block {
+  margin-left: auto;
+  margin-right: 40px;
+}
+
+.sx-section--left .sx-block {
+  margin-left: 40px;
+}
+
+.sx-section--wide .sx-block {
+  width: 100%;
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+/* --- type ----------------------------------------------------------------- */
+.sx-hero-mark {
+  display: block;
+  width: min(380px, 72%);
+  height: auto;
+  margin: 0 0 22px;
+}
+
+/*
+ * The supporting triad — "IDENTITY. AUTHORITY. TRUST." — reads as the line
+ * under the lockup. The rule carries the mark's accent, which is what ties a
+ * line of live type to the artwork above it instead of leaving it looking like
+ * one more grey label in the stack.
+ */
+.sx-tagline {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 0 0 28px;
+  color: var(--color-signal);
+  opacity: 0.85;
+}
+
+/*
+ * After a heading the triad is a caption on that heading, not a line under the
+ * lockup, so it needs air above it — set tight against a 48px cap-height it
+ * reads as a collision with the descender line.
+ */
+.sx-h2 + .sx-tagline {
+  margin-top: 20px;
+}
+
+.sx-tagline-rule {
+  flex: none;
+  width: 40px;
+  height: 1px;
+  background: var(--color-accent);
+}
+
+.sx-tagline-text {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  margin-right: -0.38em;
+  text-shadow: 0 1px 14px rgba(5, 6, 8, 0.7);
+}
+
+.sx-eyebrow {
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 10px;
+  color: var(--sx-fg);
+  opacity: 0.72;
+  text-shadow: 0 1px 14px rgba(5, 6, 8, 0.7);
+}
+
+.sx-h1 {
+  font-size: 60px;
+  line-height: 54px;
+  letter-spacing: -1px;
+  font-weight: 700;
+  text-transform: uppercase;
+  max-width: 760px;
+  text-shadow: 0 2px 24px rgba(5, 6, 8, 0.55);
+}
+
+.sx-h2 {
+  font-size: 48px;
+  line-height: 60px;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-shadow: 0 2px 24px rgba(5, 6, 8, 0.55);
+}
+
+.sx-h2--xl {
+  font-size: 80px;
+  line-height: 76px;
+}
+
+/* spacex.com tightens leading once a heading runs to three lines */
+.sx-h2--tight {
+  line-height: 48px;
+}
+
+.sx-copy {
+  margin-top: 15px;
+  width: var(--sx-copy-w);
+  max-width: 100%;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--sx-fg);
+  opacity: 0.86;
+  text-shadow: 0 1px 16px rgba(5, 6, 8, 0.6);
+}
+
+.sx-section--wide .sx-copy {
+  width: 560px;
+}
+
+/* --- outlined CTA (spacex button geometry) -------------------------------- */
+.sx-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 22px;
+  height: 50px;
+  padding: 0 20px;
+  border: 1px solid rgba(245, 247, 250, 0.35);
+  background: rgba(5, 6, 8, 0.5);
+  color: var(--sx-fg);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition:
+    background-color 0.5s var(--sx-ease),
+    color 0.5s var(--sx-ease),
+    border-color 0.5s var(--sx-ease);
+}
+
+.sx-block .sx-btn {
+  margin-top: 30px;
+}
+
+.sx-hero .sx-btn {
+  margin-top: 46px;
+}
+
+.sx-btn:hover {
+  background: var(--color-signal);
+  border-color: var(--color-signal);
+  color: var(--color-obsidian);
+}
+
+.sx-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/*
+ * The row owns the spacing above it. Left to the per-button rule, every button
+ * carries its own 30px top margin, which is invisible while they sit on one
+ * line and turns into a 44px gulf the moment they wrap on a narrow screen.
+ */
+.sx-block .sx-btn-row,
+.sx-hero .sx-btn-row {
+  margin-top: 30px;
+}
+
+.sx-hero .sx-btn-row {
+  margin-top: 46px;
+}
+
+.sx-btn-row .sx-btn {
+  margin-top: 0;
+}
+
+.sx-btn--ghost {
+  border-color: rgba(245, 247, 250, 0.18);
+}
+
+/* --- scroll reveal -------------------------------------------------------- */
+.sx-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.9s var(--sx-ease),
+    transform 0.9s var(--sx-ease);
+}
+
+.sx-reveal[data-shown="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/*
+ * Failsafe. The server renders every block at opacity 0; if the client bundle
+ * never runs, data-js is never set to "true" and this brings the content in on
+ * its own. Without it a failed bundle leaves a reader looking at a blank page
+ * rather than at un-animated copy.
+ */
+.sx-reveal[data-js="false"] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sx-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ===========================================================================
+   SCENES — section backdrops
+   spacex.com carries its sections on full-bleed photography. There is no
+   photography here and none is wanted: a protocol has no hardware to shoot, and
+   a stock image of a server room would be exactly the generic-SaaS tell we are
+   avoiding. Each section instead gets layered light plus a drawn subject, so it
+   has something to be *about* rather than being a gradient.
+=========================================================================== */
+
+.scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* the 64px lattice the parent 2600i site carries — the through-line */
+.scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(245, 247, 250, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 247, 250, 0.028) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center top;
+  mask-image: radial-gradient(120% 80% at 50% 40%, #000 20%, transparent 78%);
+}
+
+.scene-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scene-vignette--left {
+  background: linear-gradient(90deg, rgba(5, 6, 8, 0.94) 0%, rgba(5, 6, 8, 0.55) 34%, transparent 62%);
+}
+
+.scene-vignette--right {
+  background: linear-gradient(270deg, rgba(5, 6, 8, 0.94) 0%, rgba(5, 6, 8, 0.55) 34%, transparent 62%);
+}
+
+.scene-vignette--bottom {
+  background: linear-gradient(0deg, rgba(5, 6, 8, 0.92) 0%, transparent 46%);
+}
+
+.scene-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+}
+
+/*
+ * Scenes that draw *behind* body copy rather than beside it need a scrim, or
+ * the artwork reads as noise through the paragraph. The vignettes handle the
+ * alternating left/right sections; this covers the full-width ones, where the
+ * copy sits over the art instead of next to it.
+ */
+.scene-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    rgba(5, 6, 8, 0.95) 0%,
+    rgba(5, 6, 8, 0.82) 38%,
+    rgba(5, 6, 8, 0.5) 68%,
+    rgba(5, 6, 8, 0.3) 100%
+  );
+}
+
+.scene-art--left {
+  object-position: left center;
+}
+
+.scene-art--right {
+  object-position: right center;
+}
+
+/* hero: a cold horizon with the accent breaking over it */
+.scene-dawn {
+  background:
+    radial-gradient(120% 70% at 62% 88%, rgba(0, 149, 250, 0.22) 0%, transparent 58%),
+    radial-gradient(90% 60% at 20% 12%, rgba(77, 163, 255, 0.09) 0%, transparent 62%),
+    linear-gradient(180deg, #04070d 0%, #050608 52%, #04060a 100%);
+}
+
+/* mission: a single cold bloom, centred */
+.scene-orb {
+  background: linear-gradient(180deg, #050608 0%, #070a10 50%, #050608 100%);
+}
+
+.scene-orb::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1100px;
+  height: 1100px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 149, 250, 0.17) 0%, rgba(0, 149, 250, 0.05) 42%, transparent 68%);
+}
+
+.scene-gate {
+  background:
+    radial-gradient(80% 70% at 78% 50%, rgba(0, 149, 250, 0.16) 0%, transparent 62%),
+    linear-gradient(180deg, #050608 0%, #070911 100%);
+}
+
+.scene-verdict {
+  background:
+    radial-gradient(60% 60% at 22% 46%, rgba(72, 213, 151, 0.11) 0%, transparent 60%),
+    radial-gradient(60% 60% at 52% 54%, rgba(255, 181, 71, 0.10) 0%, transparent 60%),
+    radial-gradient(60% 60% at 82% 46%, rgba(255, 92, 108, 0.10) 0%, transparent 60%),
+    linear-gradient(180deg, #050608 0%, #080a10 100%);
+}
+
+.scene-hold {
+  background:
+    radial-gradient(70% 70% at 26% 50%, rgba(255, 181, 71, 0.13) 0%, transparent 60%),
+    linear-gradient(180deg, #060709 0%, #0a0a0d 100%);
+}
+
+.scene-ledger {
+  background:
+    radial-gradient(90% 60% at 50% 100%, rgba(77, 163, 255, 0.11) 0%, transparent 62%),
+    linear-gradient(180deg, #050608 0%, #080b11 100%);
+}
+
+.scene-spec {
+  background:
+    radial-gradient(70% 60% at 30% 40%, rgba(95, 244, 255, 0.08) 0%, transparent 62%),
+    linear-gradient(180deg, #050608 0%, #070a0f 100%);
+}
+
+/* ===========================================================================
+   INTERIOR PAGES
+   The landing page earns a 100vh hero. Interior pages do not: someone who has
+   already clicked through wants the content, so the masthead is sized to state
+   what the page is and then get out of the way.
+=========================================================================== */
+
+.sx-masthead {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 460px;
+  padding-bottom: 64px;
+  overflow: hidden;
+  isolation: isolate;
+  border-bottom: 1px solid var(--rule);
+}
+
+/*
+ * The masthead sits in the same measure as the page body beneath it. Without
+ * this it runs to the gutter while the content below is centred in 1180px, and
+ * the two left edges disagree by ~130px — which reads as a mistake, because it
+ * is one.
+ */
+.sx-masthead .sx-inner {
+  /* .sx-page is border-box at 1180px with the gutter as padding, so matching
+     that number here (not 1180 + gutters) is what lines the two left edges up */
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.sx-page {
+  position: relative;
+  padding: 96px var(--sx-gutter) 120px;
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.sx-page section + section {
+  margin-top: 104px;
+}
+
+.sx-page h2 {
+  font-size: 30px;
+  line-height: 38px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.sx-page h3 {
+  margin-top: 34px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-signal);
+}
+
+.sx-page p {
+  margin-top: 16px;
+  max-width: 680px;
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--color-mist);
+}
+
+.sx-page ul {
+  margin-top: 18px;
+  max-width: 680px;
+  list-style: none;
+}
+
+.sx-page li {
+  position: relative;
+  padding-left: 20px;
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--color-mist);
+}
+
+.sx-page li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 6px;
+  height: 1px;
+  background: var(--color-accent);
+}
+
+.sx-page a:not(.sx-btn) {
+  color: var(--color-ion);
+  text-underline-offset: 3px;
+  text-decoration: underline;
+  text-decoration-color: rgba(77, 163, 255, 0.35);
+}
+
+.sx-page a:not(.sx-btn):hover {
+  text-decoration-color: currentColor;
+}
+
+/* a short two-column fact strip, for numbers that are actually verifiable */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  margin-top: 34px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.fact {
+  padding: 22px 20px;
+  background: var(--color-obsidian);
+}
+
+.fact-value {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--color-signal);
+}
+
+.fact-label {
+  margin-top: 7px;
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.note {
+  margin-top: 30px;
+  padding: 18px 20px;
+  border: 1px solid var(--rule);
+  border-left: 2px solid var(--color-amber);
+  background: rgba(18, 23, 30, 0.5);
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--color-mist);
+}
+
+@media (max-width: 1100px) {
+  .sx-masthead {
+    min-height: 340px;
+    padding-bottom: 44px;
+  }
+
+  .sx-page {
+    padding: 68px var(--sx-gutter) 88px;
+  }
+
+  .sx-page section + section {
+    margin-top: 72px;
+  }
+
+  .sx-page h2 {
+    font-size: 25px;
+    line-height: 32px;
+  }
+}
+
+/* ===========================================================================
+   PRODUCT PROOF
+   Everything below renders real recorded output from the Gateway. The shapes
+   are designed; the values are not invented — see scripts/generate-gateway-trace.mjs.
+=========================================================================== */
+
+.mono {
+  font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* --- the pipeline rail ---------------------------------------------------- */
+.pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-left: 1px solid var(--rule);
+  padding-left: 0;
+}
+
+.pipeline-step {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 11px 0 11px 22px;
+}
+
+.pipeline-step::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: 17px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-slate);
+}
+
+.pipeline-step[data-state="pass"]::before {
+  background: var(--color-green);
+  box-shadow: 0 0 0 3px rgba(72, 213, 151, 0.15);
+}
+
+.pipeline-step[data-state="halt"]::before {
+  background: var(--color-red);
+  box-shadow: 0 0 0 3px rgba(255, 92, 108, 0.15);
+}
+
+.pipeline-step[data-state="hold"]::before {
+  background: var(--color-amber);
+  box-shadow: 0 0 0 3px rgba(255, 181, 71, 0.15);
+}
+
+.pipeline-name {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-signal);
+  min-width: 168px;
+}
+
+.pipeline-detail {
+  font-size: 12.5px;
+  line-height: 18px;
+  color: var(--color-slate);
+}
+
+/* --- verdict cards -------------------------------------------------------- */
+.verdicts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 40px;
+}
+
+.verdict {
+  position: relative;
+  padding: 26px 24px 28px;
+  background: rgba(18, 23, 30, 0.62);
+  border: 1px solid var(--rule);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+.verdict::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--verdict-colour);
+}
+
+.verdict[data-verdict="ALLOW"] {
+  --verdict-colour: var(--color-green);
+}
+
+.verdict[data-verdict="REQUIRE_APPROVAL"] {
+  --verdict-colour: var(--color-amber);
+}
+
+.verdict[data-verdict="DENY"] {
+  --verdict-colour: var(--color-red);
+}
+
+.verdict-name {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--verdict-colour);
+}
+
+.verdict-rule {
+  margin: 14px 0 13px;
+  height: 1px;
+  background: var(--rule-soft);
+}
+
+.verdict-copy {
+  font-size: 13.5px;
+  line-height: 20px;
+  color: var(--color-mist);
+}
+
+.verdict-meta {
+  margin-top: 16px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+/* --- audit table ---------------------------------------------------------- */
+.audit {
+  margin-top: 38px;
+  border: 1px solid var(--rule);
+  background: rgba(12, 15, 20, 0.72);
+  backdrop-filter: blur(8px);
+  overflow-x: auto;
+}
+
+.audit table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+}
+
+.audit caption {
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.audit th {
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-slate);
+  white-space: nowrap;
+}
+
+.audit td {
+  padding: 9px 18px;
+  border-bottom: 1px solid var(--rule-soft);
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--color-mist);
+  white-space: nowrap;
+}
+
+.audit tr:last-child td {
+  border-bottom: 0;
+}
+
+.audit-outcome {
+  font-weight: 600;
+}
+
+.audit-outcome[data-outcome="allowed"],
+.audit-outcome[data-outcome="completed"] {
+  color: var(--color-green);
+}
+
+.audit-outcome[data-outcome="denied"],
+.audit-outcome[data-outcome="rejected"],
+.audit-outcome[data-outcome="failed"] {
+  color: var(--color-red);
+}
+
+.audit-outcome[data-outcome="pending_approval"] {
+  color: var(--color-amber);
+}
+
+.audit-outcome[data-outcome="authorized"] {
+  color: var(--color-ion);
+}
+
+/* --- code well ------------------------------------------------------------ */
+.code {
+  margin-top: 34px;
+  border: 1px solid var(--rule);
+  background: rgba(12, 15, 20, 0.8);
+  backdrop-filter: blur(8px);
+}
+
+.code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.code pre {
+  margin: 0;
+  padding: 18px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 20px;
+  color: var(--color-mist);
+}
+
+.code .k {
+  color: var(--color-ion);
+}
+
+.code .s {
+  color: var(--color-signal);
+}
+
+.code .c {
+  color: var(--color-slate);
+}
+
+/* --- footer --------------------------------------------------------------- */
+.sx-footer {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--rule);
+  background: var(--color-obsidian);
+  padding: 54px var(--sx-gutter) 40px;
+}
+
+.sx-footer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 44px 72px;
+  justify-content: space-between;
+}
+
+.sx-footer-col h3 {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-slate);
+  margin-bottom: 14px;
+}
+
+.sx-footer-col a {
+  display: block;
+  font-size: 13.5px;
+  line-height: 26px;
+  color: var(--color-mist);
+  transition: color 0.3s var(--sx-ease);
+}
+
+.sx-footer-col a:hover {
+  color: var(--color-signal);
+}
+
+.sx-footer-base {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 26px;
+  align-items: center;
+  margin-top: 46px;
+  padding-top: 22px;
+  border-top: 1px solid var(--rule-soft);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--color-slate);
+}
+
+/* ===========================================================================
+   RESPONSIVE
+   The geometry above is measured at desktop. Below 1100px the alternating
+   left/right rhythm stops earning its keep — blocks collide with their own
+   scene art — so everything squares up to a single column.
+=========================================================================== */
+
+@media (max-width: 1100px) {
+  :root {
+    --sx-gutter: 34px;
+  }
+
+  .sx-section {
+    min-height: 0;
+    padding: 116px 0;
+  }
+
+  .sx-section--right .sx-block,
+  .sx-section--left .sx-block {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .sx-hero .sx-block {
+    width: 100%;
+  }
+
+  .sx-h1 {
+    font-size: 44px;
+    line-height: 42px;
+  }
+
+  .sx-h2 {
+    font-size: 36px;
+    line-height: 44px;
+  }
+
+  .sx-h2--xl {
+    font-size: 52px;
+    line-height: 52px;
+  }
+
+  .sx-h2--tight {
+    line-height: 38px;
+  }
+
+  .verdicts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*
+ * The bar sheds in stages rather than at a single breakpoint, because it holds
+ * three things of very different widths: the lockup, four nav items, and the
+ * status chip. Dropping them together either wastes the bar at 950px or
+ * overruns it at 780px, where the nav and the full chip both still show.
+ */
+@media (max-width: 1000px) {
+  /* the version qualifier goes first; the caveat is the part that matters */
+  .sx-status-full {
+    display: none;
+  }
+}
+
+@media (max-width: 880px) {
+  .sx-nav--primary {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .sx-header {
+    padding: 0 20px;
+  }
+
+  .sx-nav {
+    gap: 18px;
+  }
+
+  /*
+   * Down to "PREVIEW". A status pill sliced off by the viewport edge says the
+   * opposite of what a status pill is for.
+   */
+  .sx-status-lead {
+    display: none;
+  }
+
+  .sx-status {
+    letter-spacing: 0.1em;
+    padding: 0 9px;
+  }
+
+  /* the bar is 350px wide here and the lockup takes most of it */
+  .sx-logo {
+    margin-right: 14px;
+  }
+
+  .sx-h1 {
+    font-size: 34px;
+    line-height: 34px;
+    letter-spacing: -0.5px;
+  }
+
+  .sx-h2 {
+    font-size: 28px;
+    line-height: 34px;
+  }
+
+  .sx-h2--xl {
+    font-size: 38px;
+    line-height: 40px;
+  }
+
+  .sx-hero .sx-inner {
+    padding-bottom: 78px;
+  }
+
+  .sx-tagline-text {
+    font-size: 10px;
+    letter-spacing: 0.26em;
+    margin-right: -0.26em;
+  }
+
+  .sx-footer-grid {
+    gap: 32px;
+  }
+}

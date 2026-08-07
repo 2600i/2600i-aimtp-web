@@ -1,0 +1,47 @@
+# Typecheck, lint, and production build on every PR into main and every push to
+# main. No secrets are needed: this site is entirely static marketing and its
+# build reaches no external service.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Least privilege: this workflow only reads the repo and runs local checks.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Typecheck, lint, build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies (locked, reproducible)
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # The Gateway trace is committed, so the build never needs the protocol
+      # repo. This step re-runs the generator when that repo happens to be
+      # checked out alongside and fails if the committed fixture has drifted.
+      # It is a no-op (exit 0 with a notice) when the repo is absent.
+      - name: Gateway trace freshness
+        run: npm run trace:check
