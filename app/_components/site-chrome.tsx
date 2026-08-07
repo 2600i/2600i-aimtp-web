@@ -34,8 +34,15 @@ export function SiteHeader() {
       <span className="sx-nav-spacer" />
       <span className="sx-status" title="Wire version aimtp/0.1 is frozen; the surrounding tooling is a developer preview.">
         <span className="sx-status-dot" aria-hidden />
-        <span className="sx-status-lead">Developer&nbsp;</span>preview
-        <span className="sx-status-full">&nbsp;· aimtp/0.1 frozen</span>
+        {/* One flex item, so the chip's flex gap separates the dot from the
+            label rather than wedging itself between each word. Inside here it
+            is ordinary inline text, and the spaces belong to the spans that can
+            be hidden, so they disappear together at narrow widths. */}
+        <span className="sx-status-label">
+          <span className="sx-status-lead">{"Developer "}</span>
+          preview
+          <span className="sx-status-full">{" · aimtp/0.1 frozen"}</span>
+        </span>
       </span>
     </header>
   );
