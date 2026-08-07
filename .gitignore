@@ -11,3 +11,6 @@ npm-debug.log*
 next-env.d.ts
 /.claude/settings.local.json
 .gstack/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
