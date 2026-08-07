@@ -105,8 +105,8 @@ export default function DemoPage() {
             <span className="mono">~30 seconds</span>
           </div>
           <pre className="mono">
-            <code>{`git clone https://github.com/2600i/aimtp
-cd aimtp
+            <code>{`git clone https://github.com/2600i/AIMTP
+cd AIMTP
 npm ci
 npm run demo:trust-gateway`}</code>
           </pre>

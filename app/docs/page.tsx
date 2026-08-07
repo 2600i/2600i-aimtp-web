@@ -8,7 +8,18 @@ export const metadata: Metadata = {
   alternates: { canonical: "/docs" },
 };
 
-const REPO = "https://github.com/2600i/aimtp";
+/*
+ * Case matters: the repository is 2600i/AIMTP. GitHub redirects a lower-case
+ * path, but every link here would then be a redirect rather than the canonical
+ * URL.
+ *
+ * These currently resolve only for people with access — the repository is
+ * private, and docs/trust-gateway.md additionally lives on the Trust Gateway
+ * branch rather than main. Both resolve when that branch is merged and the
+ * repository is opened; until then these are known dead ends, kept deliberately
+ * so the page does not have to be rewritten twice.
+ */
+const REPO = "https://github.com/2600i/AIMTP";
 
 /*
  * These point at the repository rather than re-hosting the same prose here.
