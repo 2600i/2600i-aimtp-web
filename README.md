@@ -18,6 +18,7 @@ npm run dev
 |---|---|
 | Brand mark | `assets/brand/2600i-lockup-source.webp` → `npm run brand` |
 | Gateway trace | the real Gateway → `npm run trace` |
+| Conformance figures | the real conformance suite → `npm run trace` |
 | Everything else | hand-written |
 
 ### The brand mark
@@ -38,6 +39,13 @@ Every verdict, reason and audit row on the site is read from
 `AgentTrustGateway` from the protocol repo — not written by hand. The page
 cannot show behaviour the software does not have.
 
+The same fixture carries the conformance report, taken from
+`tests/conformance/run.mjs --json` rather than transcribed. These figures used
+to be typed into `/protocol` by hand and went stale the moment the mailbox
+schemas moved out of `schemas/`: the page claimed 58 checks while the suite ran
+54. A page arguing that conformance is a test rather than a claim cannot be
+wrong about its own test.
+
 ```sh
 npm run trace         # regenerate (needs the protocol repo alongside)
 npm run trace:check   # fail if the committed fixture has drifted
@@ -53,8 +61,17 @@ The `sx-*` layer in `app/globals.css` carries the geometry the sibling
 [`2600i-homeschool`](https://github.com/2600i/2600i-homeschool) site measured
 from spacex.com — gutters, section heights, the type scale, the outlined button.
 Token *names* (`obsidian`, `signal`, `ion`, `accent`, …) are shared across every
-2600i property; each one re-pigments them. This site runs the cold palette and
-Geist, matching the parent 2600i site, because it is developer infrastructure.
+2600i property; each one re-pigments them.
+
+Type, chrome and section grammar match the homeschool site exactly — Archivo
+with Geist Mono, `.sx-navlink` at 700, the 262×30 `.sx-pill`, the 75px footer
+row, and a homepage of alternating 450px blocks. Colour is the one deliberate
+divergence: this site keeps the parent 2600i site's cold near-black.
+
+Wide content (the audit table, verdict cards, code samples) lives on `/gateway`,
+`/demo` and `/protocol` rather than the homepage, because a 450px block cannot
+hold a seven-column table and widening one section breaks the rhythm the rest
+keep.
 
 Deliberately **not** extracted into a shared package. Three properties with the
 same token vocabulary and different pigment is the system working; a shared

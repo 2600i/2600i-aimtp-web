@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "../_components/page-shell";
-import { EnvelopeSample } from "../_components/proof";
+import { ConformanceReport, EnvelopeSample, conformanceTotal } from "../_components/proof";
 
 export const metadata: Metadata = {
   title: "Protocol",
@@ -34,7 +34,7 @@ export default function ProtocolPage() {
             <div className="fact-label">Reference implementation</div>
           </div>
           <div className="fact">
-            <div className="fact-value mono">58</div>
+            <div className="fact-value mono">{conformanceTotal()}</div>
             <div className="fact-label">Conformance checks</div>
           </div>
         </div>
@@ -62,24 +62,7 @@ export default function ProtocolPage() {
           agree byte-for-byte on the canonical signing payload. That is pinned by committed vectors
           rather than prose, so two independent implementations either agree or fail the suite.
         </p>
-        <div className="code">
-          <div className="code-bar">
-            <span>Conformance report</span>
-            <span className="mono">npm run conformance</span>
-          </div>
-          <pre className="mono">
-            <code>{`AIMTP conformance report
-  wire version: aimtp/0.1
-  schema origin: https://aimtp.net
-
-  [PASS] schema     16 passed, 0 failed
-  [PASS] canonical  10 passed, 0 failed
-  [PASS] signing     8 passed, 0 failed
-  [PASS] integrity  24 passed, 0 failed
-
-OK: conformance (58 checks)`}</code>
-          </pre>
-        </div>
+        <ConformanceReport />
       </section>
 
       <section>

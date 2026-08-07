@@ -164,6 +164,50 @@ export function EnvelopeSample() {
   );
 }
 
+/* --- conformance ---------------------------------------------------------- */
+
+/**
+ * The conformance report, rendered from the suite's own `--json` output rather
+ * than transcribed. These figures were hand-typed once and went stale the
+ * moment the mailbox schemas moved out of `schemas/`: the page claimed 58
+ * checks while the suite ran 54. A page arguing that conformance is a test
+ * rather than a claim cannot be wrong about its own test.
+ */
+export function ConformanceReport() {
+  const { conformance } = trace;
+  const pad = Math.max(...conformance.suites.map((suite) => suite.name.length)) + 2;
+
+  const lines = [
+    "AIMTP conformance report",
+    `  wire version: ${conformance.spec_version}`,
+    `  schema origin: ${conformance.schema_origin}`,
+    "",
+    ...conformance.suites.map(
+      (suite) =>
+        `  [${suite.failed ? "FAIL" : "PASS"}] ${suite.name.padEnd(pad)}${String(suite.passed).padStart(2)} passed, ${suite.failed} failed`,
+    ),
+    "",
+    `${conformance.ok ? "OK" : "FAILED"}: conformance (${conformance.total} checks)`,
+  ].join("\n");
+
+  return (
+    <div className="code">
+      <div className="code-bar">
+        <span>Conformance report</span>
+        <span className="mono">npm run conformance</span>
+      </div>
+      <pre className="mono">
+        <code>{lines}</code>
+      </pre>
+    </div>
+  );
+}
+
+/** The single headline number, so it cannot drift from the report above it. */
+export function conformanceTotal(): number {
+  return trace.conformance.total;
+}
+
 /* --- approval lifecycle --------------------------------------------------- */
 
 export function ApprovalLifecycle() {
