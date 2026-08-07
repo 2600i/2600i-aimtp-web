@@ -91,24 +91,18 @@ intended fix whenever that is picked up. It is not wired up here.
 ## Known dead links (deliberate)
 
 `/docs` links into `github.com/2600i/AIMTP`, and `/demo` tells you to clone it.
-Neither works for the public yet:
+Neither works for the public yet, because **that repository is private**. Every
+documentation link 404s for anyone without access.
 
-1. **The repository is private.** Every documentation link 404s for anyone
-   without access.
-2. **`docs/trust-gateway.md` is not on `main`.** It lives on the Trust Gateway
-   branch; the links target `blob/main/…`. The other eleven documents are on
-   `main` and are fine.
+The links are written against the destination state on purpose, so the page does
+not have to be rewritten when it opens. All twelve documents they point at are
+on `main` there, including `docs/trust-gateway.md`.
 
-Both clear when that branch is merged and the repository is opened. The links
-are written against the destination state on purpose, so the page does not have
-to be rewritten twice.
-
-Before opening the repository, two things in it need attention:
-`docs/briefings/2026-08-02-presidential-executive-briefing.md` is an externally
-authored strategic assessment that will be read as positioning, and demo private
-keys are inline in `docker-compose.federation.yml` and
-`tools/federation-demo-3hop.mjs` — throwaway, but secret scanners will flag them
-and committed private keys read badly in a security project.
+Opening that repository is the only outstanding step. The two things that
+previously blocked it have been handled: the externally authored strategic
+briefing no longer ships with the specification, and the federation demos now
+mint their Ed25519 keys on demand rather than carrying committed ones. Its
+`docs/security.md` records what remains in that repository's history and why.
 
 ## Honesty constraints
 
