@@ -31,10 +31,26 @@ const CHECK = process.argv.includes("--check");
 const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
 const ISO = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g;
 
+/*
+ * Ids are numbered rather than collapsed to one `<id>` literal. Distinct ids
+ * are distinct in the real output, and an audit log whose every row claims the
+ * same event_id is a claim the gateway does not make — on pages arguing that
+ * every decision is separately recorded, that is the wrong thing to show. The
+ * map is shared across the whole fixture, so one real id keeps one placeholder
+ * wherever it appears; numbering follows first encounter, which is stable for
+ * as long as the run is, and `--check` fails loudly if it ever stops being.
+ */
+const ids = new Map();
+
+function placeholder(id) {
+  if (!ids.has(id)) ids.set(id, `<id-${ids.size + 1}>`);
+  return ids.get(id);
+}
+
 function normalise(value) {
   return JSON.parse(
     JSON.stringify(value, (_key, v) =>
-      typeof v === "string" ? v.replace(UUID, "<id>").replace(ISO, "<timestamp>") : v,
+      typeof v === "string" ? v.replace(UUID, placeholder).replace(ISO, "<timestamp>") : v,
     ),
   );
 }
