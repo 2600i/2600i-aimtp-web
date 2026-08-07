@@ -67,14 +67,14 @@ html {
   --color-accent: var(--color-accent);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-archivo);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
 }
 
 ::selection {
@@ -138,14 +138,14 @@ body {
  * mark's own 5.4:1. This is the shared 2600i mark with its sub-brand line
  * removed — see scripts/build-brand-assets.mjs.
  */
-.sx-mark {
+.sx-wordmark {
   display: block;
   width: auto;
   height: 21px;
   transition: opacity 0.3s var(--sx-ease);
 }
 
-.sx-logo:hover .sx-mark {
+.sx-logo:hover .sx-wordmark {
   opacity: 0.82;
 }
 
@@ -182,55 +182,99 @@ body {
   align-items: center;
 }
 
-.sx-nav-link {
+.sx-navlink {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--sx-fg);
-  opacity: 0.85;
+  opacity: 0.92;
   transition: opacity 0.3s var(--sx-ease);
+  white-space: nowrap;
 }
 
-.sx-nav-link:hover {
+.sx-navlink:hover {
   opacity: 1;
 }
 
-.sx-nav-spacer {
-  margin-left: auto;
+/* The hover column the header backdrop drops behind. */
+.sx-nav-panel {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 160px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.35s var(--sx-ease),
+    transform 0.35s var(--sx-ease),
+    visibility 0.35s;
+}
+
+.sx-nav-item:hover .sx-nav-panel,
+.sx-nav-item:focus-within .sx-nav-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.sx-sublink {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  line-height: 15px;
+  color: var(--sx-fg);
+  opacity: 0.65;
+  white-space: nowrap;
+  transition: opacity 0.25s var(--sx-ease);
+}
+
+.sx-sublink:hover {
+  opacity: 1;
 }
 
 /*
- * Status, stated plainly. This is a developer preview and the wire version is
- * frozen — both are true, and saying so is what keeps the rest of the page
- * from having to imply a maturity it does not have.
+ * Status, stated plainly, in the slot the sibling site gives its week clock:
+ * a fixed-width bordered rectangle at the right end of the bar, split into a
+ * label and a mono readout. Both halves are true — the wire version is frozen
+ * and everything around it is a preview — and saying so is what keeps the rest
+ * of the page from having to imply a maturity it has not earned.
  */
-.sx-status {
-  display: inline-flex;
+.sx-pill {
+  position: relative;
+  margin-left: auto;
+  display: flex;
   align-items: center;
-  gap: 9px;
-  height: 26px;
-  padding: 0 11px;
-  border: 1px solid var(--rule);
-  border-radius: 13px;
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--color-mist);
+  justify-content: space-between;
+  gap: 16px;
+  width: 262px;
+  height: 30px;
+  padding: 0 12px;
   white-space: nowrap;
-  /* the hero's key field runs behind this corner; without a scrim the chip
-     competes with the artwork instead of sitting on top of it */
-  background: rgba(5, 6, 8, 0.62);
-  backdrop-filter: blur(6px);
+  border: 1px solid rgba(245, 247, 250, 0.35);
+  background: rgba(5, 6, 8, 0.35);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--sx-fg);
+  transition: background-color 0.5s var(--sx-ease);
 }
 
-.sx-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(0, 149, 250, 0.16);
+.sx-pill:hover {
+  background: rgba(245, 247, 250, 0.12);
+}
+
+.sx-pill-clock {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
 }
 
 /* --- sections ------------------------------------------------------------- */
@@ -296,11 +340,55 @@ body {
 }
 
 /* --- type ----------------------------------------------------------------- */
-.sx-hero-mark {
+/*
+ * Flush left, at the sibling site's size, with no optical correction: the
+ * artwork is cropped tight to its own ink, so the "2" starts where the image
+ * does and lines up with the "T" of the headline underneath.
+ */
+.sx-hero-lockup {
+  width: min(520px, 100%);
+  margin: 0 0 18px;
+}
+
+.sx-hero-logo {
   display: block;
-  width: min(380px, 72%);
+  width: 100%;
   height: auto;
-  margin: 0 0 22px;
+}
+
+/*
+ * The sub-brand line, sitting where "HOMESCHOOL" sits on the sibling site:
+ * under the numerals, tracked out until it spans most of their width. Five
+ * letters have to cover the ground ten do there, hence the wide tracking; the
+ * trailing space that tracking hangs after the final glyph is pulled back so
+ * the run stays optically centred.
+ */
+.sx-hero-subbrand {
+  display: block;
+  margin-top: 6px;
+  padding-left: 4%;
+  font-size: clamp(11px, 2vw, 17px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 1.42em;
+  text-indent: 1.42em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-signal);
+  opacity: 0.92;
+}
+
+/* visually hidden, still read aloud */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /*
@@ -524,6 +612,25 @@ body {
   background-size: 64px 64px;
   background-position: center top;
   mask-image: radial-gradient(120% 80% at 50% 40%, #000 20%, transparent 78%);
+}
+
+/*
+ * Fine horizontal rules across the artwork, masked to fade in and out down the
+ * frame. Carried over verbatim from the sibling site — it is what stops a
+ * gradient backdrop reading as an empty gradient.
+ */
+.scene-rules {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgba(245, 247, 250, 0.05) 0px,
+    rgba(245, 247, 250, 0.05) 1px,
+    transparent 1px,
+    transparent 38px
+  );
+  mask-image: linear-gradient(180deg, transparent 40%, #000 68%, transparent 92%);
+  pointer-events: none;
 }
 
 .scene-vignette {
@@ -1048,53 +1155,82 @@ body {
 }
 
 /* --- footer --------------------------------------------------------------- */
+/*
+ * One 75px row, as on the sibling site: a back-to-top square pinned to the left
+ * gutter, the links centred in the remaining space, and the copyright pushed
+ * right. A docs-heavy site invites a multi-column sitemap down here; this one
+ * deliberately does not have it, because the bar already carries every
+ * destination and a second copy of the same five links is just weight.
+ */
 .sx-footer {
   position: relative;
   z-index: 2;
-  border-top: 1px solid var(--rule);
-  background: var(--color-obsidian);
-  padding: 54px var(--sx-gutter) 40px;
-}
-
-.sx-footer-grid {
+  height: 75px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 44px 72px;
-  justify-content: space-between;
-}
-
-.sx-footer-col h3 {
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-slate);
-  margin-bottom: 14px;
-}
-
-.sx-footer-col a {
-  display: block;
-  font-size: 13.5px;
-  line-height: 26px;
-  color: var(--color-mist);
-  transition: color 0.3s var(--sx-ease);
-}
-
-.sx-footer-col a:hover {
+  align-items: center;
+  padding: 0 var(--sx-gutter);
+  background: var(--color-obsidian);
   color: var(--color-signal);
 }
 
-.sx-footer-base {
+.sx-footer-links {
+  margin: 0 auto;
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px 26px;
   align-items: center;
-  margin-top: 46px;
-  padding-top: 22px;
-  border-top: 1px solid var(--rule-soft);
-  font-size: 11.5px;
-  letter-spacing: 0.04em;
-  color: var(--color-slate);
+  gap: 28px;
+  white-space: nowrap;
+}
+
+@media (max-width: 1000px) {
+  .sx-footer-links {
+    gap: 16px;
+  }
+}
+
+.sx-footer a,
+.sx-footer span {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sx-footer-links a {
+  opacity: 0.75;
+  transition: opacity 0.3s var(--sx-ease);
+}
+
+.sx-footer-links a:hover {
+  opacity: 1;
+}
+
+.sx-totop {
+  position: absolute;
+  left: var(--sx-gutter);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(245, 247, 250, 0.35);
+  transition: background-color 0.4s var(--sx-ease);
+}
+
+.sx-totop:hover {
+  background: rgba(245, 247, 250, 0.14);
+}
+
+.sx-copyright {
+  margin-left: auto;
+  opacity: 0.75;
+}
+
+/*
+ * The lowercase "i" in 2600i is a brand element — it is the glyph carrying the
+ * accent in the mark. Uppercase runs like the footer and the bar would render
+ * it "2600I", so the name opts out of the transform wherever it appears inside
+ * one.
+ */
+.brandcase {
+  text-transform: none;
 }
 
 /* ===========================================================================
@@ -1150,50 +1286,110 @@ body {
   }
 }
 
-/*
- * The bar sheds in stages rather than at a single breakpoint, because it holds
- * three things of very different widths: the lockup, four nav items, and the
- * status chip. Dropping them together either wastes the bar at 950px or
- * overruns it at 780px, where the nav and the full chip both still show.
- */
-@media (max-width: 1000px) {
-  /* the version qualifier goes first; the caveat is the part that matters */
-  .sx-status-full {
+@media (max-width: 1040px) {
+  /*
+   * Below this width the single row can no longer hold every item, so the nav
+   * wraps onto as many rows as it needs — nothing is ever scrolled off or
+   * folded away behind a button. The bar also stops being fixed here, so the
+   * extra rows do not sit permanently on top of the page on a phone.
+   */
+  .sx-header {
+    position: absolute;
+    height: auto;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 12px;
+    padding: 16px 24px 18px;
+  }
+
+  .sx-logo {
+    margin-right: 16px;
+  }
+
+  .sx-nav {
+    order: 3;
+    flex: 1 0 100%;
+    height: auto;
+    flex-wrap: wrap;
+    gap: 11px 18px;
+    margin-right: 0;
+  }
+
+  .sx-nav-item {
+    height: auto;
+  }
+
+  /* hover columns cannot work in a wrapped bar; the parent link stands in */
+  .sx-nav-panel {
     display: none;
+  }
+
+  .sx-header:has(.sx-nav-item--menu:hover) .sx-header-backdrop,
+  .sx-header:has(.sx-nav-item--menu:focus-within) .sx-header-backdrop {
+    opacity: 0;
+    height: 0;
+  }
+
+  .sx-pill {
+    margin-left: auto;
+  }
+
+  .sx-navlink,
+  .sx-sublink {
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
   }
 }
 
-@media (max-width: 880px) {
-  .sx-nav--primary {
-    display: none;
+@media (max-width: 900px) {
+  /*
+   * One nowrap row of links plus a copyright cannot fit a phone, so the footer
+   * stacks and the to-top control rejoins the flow rather than sitting over
+   * the first line.
+   */
+  .sx-footer {
+    height: auto;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px 20px;
+  }
+
+  .sx-footer-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 18px;
+  }
+
+  .sx-totop {
+    position: static;
+  }
+
+  .sx-copyright {
+    margin: 0;
   }
 }
 
 @media (max-width: 720px) {
   .sx-header {
-    padding: 0 20px;
+    padding: 14px 20px 16px;
+    row-gap: 10px;
   }
 
   .sx-nav {
-    gap: 18px;
+    gap: 10px 14px;
   }
 
-  /*
-   * Down to "PREVIEW". A status pill sliced off by the viewport edge says the
-   * opposite of what a status pill is for.
-   */
-  .sx-status-lead {
-    display: none;
+  .sx-navlink,
+  .sx-sublink {
+    font-size: 11px;
+    letter-spacing: 0.04em;
   }
 
-  .sx-status {
-    letter-spacing: 0.1em;
-    padding: 0 9px;
-  }
-
-  /* the bar is 350px wide here and the lockup takes most of it */
-  .sx-logo {
-    margin-right: 14px;
+  .sx-pill {
+    width: auto;
+    gap: 10px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
   }
 
   .sx-h1 {
@@ -1222,7 +1418,14 @@ body {
     margin-right: -0.26em;
   }
 
-  .sx-footer-grid {
-    gap: 32px;
+}
+
+@media (max-width: 400px) {
+  .sx-header {
+    padding: 12px 16px 14px;
+  }
+
+  .sx-wordmark {
+    height: 18px;
   }
 }

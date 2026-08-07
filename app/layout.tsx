@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Archivo, Geist_Mono } from "next/font/google";
 import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 /*
- * Geist, matching the parent 2600i site. The sibling homeschool property runs
- * Archivo — warmer, and right for that subject. This is developer
- * infrastructure, and the mono face is load-bearing here: envelopes, verdicts
- * and audit rows are all set in it, so the pair has to be designed together.
+ * The same pairing the sibling homeschool property runs, so the two sites set
+ * type identically. Archivo is the closest widely-available stand-in for
+ * spacex.com's D-DIN: tall x-height, engineered grotesque, holds up in all-caps
+ * at display sizes.
+ *
+ * Geist Mono carries the load-bearing detail here — envelopes, verdicts, audit
+ * rows and the version in the bar are all set in it.
  */
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 const TITLE = "AIMTP by 2600i";
@@ -41,7 +48,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${archivo.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full">{children}</body>
     </html>
   );

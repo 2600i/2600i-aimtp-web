@@ -14,7 +14,7 @@ import Link from "next/link";
  * so there is nothing for the optimiser to choose between, and this keeps the
  * mark off a /_next/image round trip on first paint.
  */
-export function Mark({ className = "sx-mark" }: { className?: string }) {
+export function Mark({ className = "sx-wordmark" }: { className?: string }) {
   return (
     /* Intrinsic size is fixed and known, so the optimiser has nothing to choose
        between, and this keeps the mark off a /_next/image round trip on first
@@ -30,6 +30,24 @@ export function Mark({ className = "sx-mark" }: { className?: string }) {
       fetchPriority="high"
       decoding="async"
     />
+  );
+}
+
+/**
+ * The hero lockup: the mark at full size with the sub-brand line beneath it,
+ * exactly where the sibling site carries "HOMESCHOOL". There it is drawn into
+ * the artwork; here it is live text, so one mark file serves every sub-brand
+ * and the word can be restyled without a re-export.
+ */
+export function HeroLockup() {
+  return (
+    <div className="sx-hero-lockup">
+      <Mark className="sx-hero-logo" />
+      <span className="sx-hero-subbrand" aria-hidden>
+        AIMTP
+      </span>
+      <span className="sr-only">AIMTP by 2600i</span>
+    </div>
   );
 }
 
