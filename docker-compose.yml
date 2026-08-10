@@ -13,4 +13,20 @@ services:
       - "127.0.0.1:3002:3000"
     environment:
       NEXT_PUBLIC_SITE_URL: "${NEXT_PUBLIC_SITE_URL:-https://aimtp.2600i.com}"
+      # Backs /demo/agent-trust-gateway. Server-side only, read at run time, so
+      # it can be set without a rebuild. Empty means the page renders its
+      # "unavailable" state and points at the recorded run — which is the
+      # correct behaviour until the sidecar is actually deployed.
+      AIMTP_DEMO_ORIGIN: "${AIMTP_DEMO_ORIGIN:-}"
     restart: unless-stopped
+    # Joined only when the demo sidecar is running. `aimtp-demo` is created once
+    # with `docker network create aimtp-demo` and shared with the protocol
+    # repository's docker-compose.demo.yml.
+    networks:
+      - default
+      - aimtp-demo
+
+networks:
+  aimtp-demo:
+    external: true
+    name: aimtp-demo

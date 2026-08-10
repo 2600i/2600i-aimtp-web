@@ -34,7 +34,7 @@ const SECTIONS = [
     heading: "Every agent request, interrogated",
     tagline: "Verify. Authorize. Act.",
     copy: "The Gateway sits between an external agent and a protected system and answers the same questions every time, in the same order — identity before authority, and both before anything executes.",
-    cta: { label: "How it works", href: "/gateway" },
+    cta: { label: "Drive it yourself", href: "/demo/agent-trust-gateway" },
     tight: true,
   },
   {
@@ -110,10 +110,20 @@ export default function Home() {
               <Tagline>Identity. Authority. Trust.</Tagline>
               <span className="sx-eyebrow">aimtp/0.1 · developer preview</span>
               <h1 className="sx-h1">The trust layer for AI agents</h1>
-              <Link href="/gateway" className="sx-btn">
-                See the Gateway
-                <Arrow />
-              </Link>
+              {/* The demo leads: it is the one thing on the site a visitor can
+                  operate rather than read, and it answers "is any of this real"
+                  in about ninety seconds. The explanation stays one click away
+                  for anyone who wants it first. */}
+              <div className="sx-btn-row">
+                <Link href="/demo/agent-trust-gateway" className="sx-btn">
+                  Try the Gateway demo
+                  <Arrow />
+                </Link>
+                <Link href="/gateway" className="sx-btn sx-btn--ghost">
+                  How it works
+                  <Arrow />
+                </Link>
+              </div>
             </Reveal>
           </div>
         </section>

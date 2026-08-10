@@ -19,6 +19,7 @@ npm run dev
 | Brand mark | `assets/brand/2600i-lockup-source.webp` → `npm run brand` |
 | Gateway trace | the real Gateway → `npm run trace` |
 | Conformance figures | the real conformance suite → `npm run trace` |
+| Live demo verdicts | the real Gateway, at request time → the demo sidecar |
 | Everything else | hand-written |
 
 ### The brand mark
@@ -54,6 +55,38 @@ npm run trace:check   # fail if the committed fixture has drifted
 The generator looks for the protocol repo at `../2600i-AIMTP`, overridable with
 `AIMTP_REPO`. The fixture is committed, so neither the build nor CI needs that
 repo present; `trace:check` exits 0 with a notice when it is absent.
+
+### The live demo
+
+`/demo/agent-trust-gateway` is interactive: each button drives a real
+`AgentTrustGateway` and shows what it answered. `/demo` stays what it was — a
+recorded run, rendered from the committed fixture.
+
+The Gateway cannot run in this container. `aimtp` is a private, unpublished
+package and this repository is its own Docker build context, so there is no way
+to `require()` it here. The live demo is therefore a **sidecar**: the protocol
+repository's `docker-compose.demo.yml` runs the Gateway demo service, and
+`app/api/gateway-demo/[...path]/route.ts` proxies to it server-side. Keys,
+signing and Gateway state stay entirely on that side; the browser only ever
+talks to this origin, which is why `connect-src 'self'` needs no exception.
+
+```sh
+docker network create aimtp-demo                                  # once
+docker compose -f docker-compose.demo.yml up --build -d           # protocol repo
+AIMTP_DEMO_ORIGIN=http://aimtp-gateway-demo:8090 docker compose up -d
+```
+
+`AIMTP_DEMO_ORIGIN` is read at run time and is deliberately not `NEXT_PUBLIC_*`,
+so the sidecar is never addressable from a browser. **Unset is a supported
+state**: the page renders a labelled "unavailable" panel and points at the
+recorded run. It never substitutes a frontend animation for the real Gateway —
+a page whose argument is that the verdicts are real cannot fake them when the
+service is down.
+
+Each visitor gets an isolated in-memory Gateway, keyed by an `httpOnly` session
+cookie. That is load-bearing rather than tidy: the controller holds the pending
+approval and the used envelope ids, so a shared instance would let one visitor's
+approval claim another's held request.
 
 ## Design system
 
@@ -107,9 +140,9 @@ intended fix whenever that is picked up. It is not wired up here.
 
 ## Known dead links (deliberate)
 
-`/docs` links into `github.com/2600i/AIMTP`, and `/demo` tells you to clone it.
-Neither works for the public yet, because **that repository is private**. Every
-documentation link 404s for anyone without access.
+`/docs` links into `github.com/2600i/AIMTP`, and both demo pages tell you to
+clone it. Neither works for the public yet, because **that repository is
+private**. Every documentation link 404s for anyone without access.
 
 The links are written against the destination state on purpose, so the page does
 not have to be rewritten when it opens. All twelve documents they point at are

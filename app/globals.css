@@ -1443,3 +1443,422 @@ body {
   outline-offset: 3px;
   border-radius: 1px;
 }
+
+/* ===========================================================================
+   INTERACTIVE GATEWAY DEMO  (/demo/agent-trust-gateway)
+   Panels rather than the alternating full-bleed blocks the rest of the site
+   uses: this page is a control surface, and a reader driving it needs the steps
+   and the verdict on screen together instead of scrolling between them.
+=========================================================================== */
+
+.demo {
+  margin-top: 30px;
+}
+
+.demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.demo-controls .sx-btn {
+  cursor: pointer;
+}
+
+.demo-controls .sx-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.demo-controls .sx-btn:disabled:hover {
+  background: rgba(5, 6, 8, 0.5);
+  border-color: rgba(245, 247, 250, 0.35);
+  color: var(--sx-fg);
+}
+
+.demo-fine {
+  flex: 1 1 220px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--color-slate);
+}
+
+.demo-error {
+  margin-top: 22px;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 92, 108, 0.4);
+  border-left: 2px solid var(--color-red);
+  background: rgba(255, 92, 108, 0.06);
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--color-signal);
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 26px;
+  align-items: start;
+}
+
+.demo-panel {
+  border: 1px solid var(--rule);
+  background: rgba(12, 15, 20, 0.72);
+  padding: 22px;
+}
+
+.demo-panel + .demo-panel,
+.demo-grid + .demo-panel {
+  margin-top: 24px;
+}
+
+.demo-panel-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.demo-panel--status {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 30px;
+}
+
+.demo-panel--status p {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--color-mist);
+}
+
+/* --- the step list -------------------------------------------------------- */
+
+.demo-steps {
+  margin-top: 18px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* The page's generic list rule draws a dash bullet and indents; these rows are
+   buttons and own their own layout. */
+.demo-steps li {
+  margin: 0;
+  padding: 0;
+}
+
+.demo-steps li::before {
+  content: none;
+}
+
+.demo-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--rule);
+  background: rgba(5, 6, 8, 0.45);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.35s var(--sx-ease),
+    background-color 0.35s var(--sx-ease);
+}
+
+.demo-step:hover:not(:disabled) {
+  border-color: rgba(245, 247, 250, 0.28);
+  background: rgba(18, 23, 30, 0.8);
+}
+
+.demo-step:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.demo-step[data-active="true"] {
+  border-color: var(--color-accent);
+  background: rgba(0, 149, 250, 0.08);
+}
+
+.demo-step-index {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rule);
+  font-size: 11px;
+  color: var(--color-slate);
+}
+
+.demo-step[data-done="true"] .demo-step-index {
+  border-color: transparent;
+  background: var(--color-green);
+  color: var(--color-obsidian);
+}
+
+.demo-step-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.demo-step-title {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-signal);
+}
+
+.demo-step-detail {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--color-slate);
+}
+
+.demo-step-expect {
+  flex: none;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 4px 8px;
+  border: 1px solid var(--rule);
+  color: var(--color-mist);
+}
+
+.demo-step[data-tone="allow"] .demo-step-expect {
+  border-color: rgba(72, 213, 151, 0.4);
+  color: var(--color-green);
+}
+
+.demo-step[data-tone="hold"] .demo-step-expect {
+  border-color: rgba(255, 181, 71, 0.4);
+  color: var(--color-amber);
+}
+
+.demo-step[data-tone="deny"] .demo-step-expect {
+  border-color: rgba(255, 92, 108, 0.4);
+  color: var(--color-red);
+}
+
+.demo-note,
+.demo-empty {
+  margin-top: 16px;
+  font-size: 12px;
+  line-height: 19px;
+  color: var(--color-slate);
+}
+
+/* --- the verdict ---------------------------------------------------------- */
+
+.demo-verdict {
+  position: relative;
+  margin-top: 18px;
+  padding: 20px 20px 20px 22px;
+  border: 1px solid var(--rule);
+  background: rgba(5, 6, 8, 0.5);
+}
+
+.demo-verdict::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-slate);
+  transition: background-color 0.4s var(--sx-ease);
+}
+
+.demo-verdict[data-tone="allow"]::before { background: var(--color-green); }
+.demo-verdict[data-tone="hold"]::before { background: var(--color-amber); }
+.demo-verdict[data-tone="deny"]::before { background: var(--color-red); }
+
+.demo-badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  padding: 5px 10px;
+  border: 1px solid var(--rule);
+  color: var(--color-mist);
+}
+
+.demo-verdict[data-tone="allow"] .demo-badge {
+  border-color: rgba(72, 213, 151, 0.45);
+  color: var(--color-green);
+}
+
+.demo-verdict[data-tone="hold"] .demo-badge {
+  border-color: rgba(255, 181, 71, 0.45);
+  color: var(--color-amber);
+}
+
+.demo-verdict[data-tone="deny"] .demo-badge {
+  border-color: rgba(255, 92, 108, 0.45);
+  color: var(--color-red);
+}
+
+.demo-verdict-title {
+  margin-top: 14px;
+  font-size: 17px;
+  line-height: 24px;
+  color: var(--color-signal);
+}
+
+.demo-verdict-copy {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--color-mist);
+}
+
+.demo-reason {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule-soft);
+  font-size: 12px;
+  line-height: 19px;
+  color: var(--color-mist);
+  word-break: break-word;
+}
+
+.demo-reason span {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.demo-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 18px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.demo-metrics > div {
+  padding: 14px 12px;
+  background: rgba(5, 6, 8, 0.7);
+}
+
+.demo-metrics dt {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-slate);
+}
+
+.demo-metrics dd {
+  margin: 6px 0 0;
+  font-size: 22px;
+  line-height: 26px;
+  color: var(--color-signal);
+}
+
+.demo-pending {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 13px 15px;
+  border: 1px solid rgba(255, 181, 71, 0.35);
+  background: rgba(255, 181, 71, 0.06);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--color-mist);
+}
+
+.demo-pending-dot {
+  flex: none;
+  margin-top: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-amber);
+  animation: demo-pulse 2s var(--sx-ease) infinite;
+}
+
+.demo-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--rule);
+  border-top-color: var(--color-ion);
+  border-radius: 50%;
+  animation: demo-spin 0.9s linear infinite;
+}
+
+@keyframes demo-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes demo-spin {
+  to { transform: rotate(360deg); }
+}
+
+/*
+ * Reduced motion. The spinner keeps its ring so "working" is still legible as a
+ * state; it just stops rotating, and the pending dot stops pulsing.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .demo-pending-dot,
+  .demo-spinner {
+    animation: none;
+  }
+
+  .demo-step,
+  .demo-verdict::before,
+  .demo-controls .sx-btn {
+    transition: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  .demo-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .demo-panel {
+    padding: 18px 16px;
+  }
+
+  .demo-step {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .demo-step-body {
+    flex-basis: calc(100% - 36px);
+  }
+
+  /* The expected verdict drops under the text rather than squeezing it to a
+     two-word column on a phone. */
+  .demo-step-expect {
+    margin-left: 36px;
+  }
+
+  .demo-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .demo-controls .sx-btn {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}
