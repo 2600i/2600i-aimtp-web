@@ -1429,3 +1429,17 @@ body {
     height: 18px;
   }
 }
+
+/* ===========================================================================
+   FOCUS
+   The site had no focus styling at all, so keyboard users got whatever the
+   browser drew over a near-black background — in practice a thin dark ring on
+   dark. :focus-visible rather than :focus so a mouse click on a button does not
+   leave a ring behind it.
+=========================================================================== */
+
+:where(a, button, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-ion);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
