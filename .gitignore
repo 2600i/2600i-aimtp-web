@@ -14,3 +14,8 @@ next-env.d.ts
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+
+# Schemas staged for the reverse proxy by `npm run schemas`. Derived from the
+# protocol repo, which stays their only definition — committing a copy here
+# would be a second one, free to drift.
+/dist-schemas/
