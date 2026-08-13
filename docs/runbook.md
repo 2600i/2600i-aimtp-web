@@ -229,5 +229,8 @@ itself:
   authenticate; the sidecar does not.
 - **A CAA record omitting Cloudflare's live edge issuer** — breaks certificate
   renewal weeks later, not at apply time.
+- **A cross-domain DMARC `rua` without the `_report._dmarc` record in the
+  receiving zone** — receivers refuse to send reports. Enforcement still works,
+  so the symptom is an empty inbox that looks like nobody spoofing you.
 - **Editing `/etc/nginx/sites-available/aimtp.conf`** — nginx is installed,
   disabled, and serves nothing. It is the file you would reach for first.
