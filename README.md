@@ -3,9 +3,8 @@
 The marketing and documentation site for **AIMTP by 2600i** — the open protocol
 and the Agent Trust Gateway built on it.
 
-Canonical host: **aimtp.net** (`aimtp.2600i.com` redirects to it). Three path
-prefixes on that origin belong to the protocol's schemas rather than to the
-site — see [aimtp.net](#aimtpnet).
+Canonical host: **aimtp.net**. Three path prefixes on that origin belong to the
+protocol's schemas rather than to the site — see [aimtp.net](#aimtpnet).
 
 ## Run it
 
@@ -129,8 +128,11 @@ Full proxy configuration, TLS and DNS are in [`docs/deployment.md`](docs/deploym
 
 ## aimtp.net
 
-The site is canonical at `aimtp.net`, and `aimtp.2600i.com` 301s to it. But the
-site does **not** own that whole origin.
+The site is canonical at `aimtp.net`. But it does **not** own that whole origin.
+
+(`aimtp.2600i.com` appears in older notes as the canonical host. It was never
+deployed and has no DNS record, so nothing redirects from it — there is nothing
+to redirect.)
 
 `aimtp.net` is a protocol namespace before it is a marketing host. It is the
 `$id` origin for the protocol repo's JSON Schemas, and three path prefixes are
@@ -145,13 +147,12 @@ therefore reserved:
 These are identifiers, not documentation links. `spec/trust-bundle-v0.4` names
 three siblings by absolute URL, so a validator resolving a trust bundle fetches
 them over the network — and answering one of those URLs with HTML, or with a
-redirect, fails validation in someone else's process. That is why the earlier
-plan to blanket-redirect the apex was wrong, and it is the one constraint the
-redirect has to respect.
+redirect, fails validation in someone else's process.
 
-The proxy serves them as static files **ahead of** this app, so the Next
-application cannot answer them however its routes later change, and schema
-resolution survives a site outage or a bad deploy.
+Caddy serves them as static files from a `handle` block that is mutually
+exclusive with the reverse proxy, so this application cannot answer them however
+its routes later change, and schema resolution survives a site outage or a bad
+deploy.
 
 ```sh
 npm run schemas         # stage into dist-schemas/ (needs the protocol repo)
@@ -169,9 +170,9 @@ sibling clone still builds.
 See `docs/deployment.md` for the proxy configuration, including the reserved
 locations and the CORS and content-type headers validators need.
 
-`relay.aimtp.net` is separate and is not served by this repo. It is already the
-compiled-in default in the protocol repo's CLI (`cli/aimtp-send.mjs`), so it is a
-host that has to exist rather than a name still open for discussion.
+`relay.aimtp.net` is separate and is not served by this repo. It is already
+deployed, already the compiled-in default in the protocol repo's CLI
+(`cli/aimtp-send.mjs`), and answers 401 without an API key.
 
 ## Known dead links (deliberate)
 

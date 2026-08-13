@@ -12,10 +12,10 @@
  * crawler, and the sort of bug that only shows up in production because it is
  * right on a laptop.
  *
- * aimtp.net is canonical and aimtp.2600i.com redirects to it. Note that the
- * site does not own that whole origin: /schemas/, /spec/ and /runtime/schemas/
- * are the `$id` namespace of the protocol's JSON Schemas and are served as
- * static files by the reverse proxy, ahead of this app. See README.
+ * aimtp.net is canonical. Note that the site does not own that whole origin:
+ * /schemas/, /spec/ and /runtime/schemas/ are the `$id` namespace of the
+ * protocol's JSON Schemas and are served from disk by Caddy, in a block that is
+ * mutually exclusive with the one proxying here. See docs/deployment.md.
  */
 const FALLBACK = "http://localhost:3000";
 
