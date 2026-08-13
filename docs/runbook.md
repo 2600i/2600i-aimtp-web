@@ -215,6 +215,18 @@ The console needs a root password. If none is set, that fallback does not exist
 when you need it. Set one and log in once to confirm — an untested recovery path
 is not a recovery path.
 
+**That password is deliberately useless over SSH.** `sshd` runs with
+`passwordauthentication no` and `permitrootlogin without-password`, so port 22
+stays key-only and the password buys a way in *only* at the console, which is
+attached to the VM rather than reachable over the network. The fallback was
+added without widening the everyday path.
+
+The consequence is a report that sounds like a bug and is not: the root password
+does not work over SSH, and it should not. Enabling `PasswordAuthentication` to
+"fix" that would expose a password-guessable root login to the internet in order
+to make a recovery path more convenient than it needs to be. Verify with
+`sshd -T | grep -iE 'passwordauthentication|permitrootlogin'`.
+
 ## Things that fail silently
 
 Collected because each was found the hard way, and none of them announces
@@ -234,3 +246,6 @@ itself:
   so the symptom is an empty inbox that looks like nobody spoofing you.
 - **Editing `/etc/nginx/sites-available/aimtp.conf`** — nginx is installed,
   disabled, and serves nothing. It is the file you would reach for first.
+- **Enabling SSH password authentication** to make the console password work
+  over the network — it is meant not to. Nothing breaks visibly; the box simply
+  acquires a guessable root login on a port the whole internet can reach.
