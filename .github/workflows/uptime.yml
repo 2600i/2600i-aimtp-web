@@ -1,0 +1,109 @@
+# Synthetic uptime check against the live site.
+#
+# This exists because the demo's failure mode is silence. When the Gateway
+# sidecar is unreachable the page renders a labelled "unavailable" panel and the
+# API answers 503 — deliberately, so the site never fakes a live Gateway. That
+# is the correct behaviour and it is indistinguishable, from the outside, from
+# nobody having deployed it yet. The homepage's primary call to action would sit
+# broken indefinitely and nothing would report it.
+#
+# So the check drives a real scenario rather than pinging for a 200. A process
+# that is listening but answering DENY to everything, or that has lost its
+# policy, passes a liveness ping and fails this.
+#
+# No secrets. Every endpoint here is public.
+name: Uptime
+
+on:
+  schedule:
+    # Every 15 minutes. GitHub's scheduler is best-effort and runs late under
+    # load, so treat this as "roughly quarter-hourly" — it is a canary, not an
+    # SLA instrument. Note GitHub disables scheduled workflows after 60 days
+    # with no repository activity.
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A late run must not stack on top of a running one.
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    name: Probe the live site
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check
+        run: |
+          set -uo pipefail
+
+          FAILED=()
+
+          # Transient edge blips are not incidents. Each probe gets three
+          # attempts with backoff, so a single dropped connection does not page
+          # anyone at 4am; two minutes of real downtime still does.
+          probe() {
+            local name="$1" url="$2" want="$3" attempt code
+            for attempt in 1 2 3; do
+              code=$(curl -sS -o /tmp/body -w '%{http_code}' --max-time 20 "$url" 2>/dev/null || echo 000)
+              [ "$code" = "$want" ] && { echo "  ok    $name ($code)"; return 0; }
+              [ "$attempt" -lt 3 ] && sleep $((attempt * 5))
+            done
+            echo "  FAIL  $name — got $code, wanted $want  [$url]"
+            FAILED+=("$name")
+            return 1
+          }
+
+          echo "Reachability"
+          probe "site"        "https://aimtp.net/"                            200
+          probe "health"      "https://aimtp.net/api/health"                  200
+          probe "demo page"   "https://aimtp.net/demo/agent-trust-gateway"    200
+          probe "security.txt" "https://aimtp.net/.well-known/security.txt"   200
+
+          # A schema $id that resolves to nothing breaks validation in someone
+          # else's process, which is the one failure here nobody would report.
+          echo "Schema namespace"
+          probe "schema \$id"  "https://aimtp.net/schemas/envelope.schema.json" 200
+          probe "cross-\$ref"  "https://aimtp.net/spec/identity-anchor-set-v0.4.schema.json" 200
+
+          # 401 is correct and load-bearing: it proves the relay is up *and*
+          # still requires authentication. A 200 here would be the alarming one.
+          echo "Relay"
+          probe "relay authenticating" "https://relay.aimtp.net/aimtp" 401
+
+          # The real check. Drive an actual decision through the Gateway.
+          echo "Gateway decision"
+          JAR=$(mktemp)
+          STATE=$(curl -sS -c "$JAR" -b "$JAR" -o /tmp/state -w '%{http_code}' --max-time 20 \
+                  https://aimtp.net/api/gateway-demo/state 2>/dev/null || echo 000)
+          if [ "$STATE" != "200" ]; then
+            # 503 is the documented unconfigured state: the sidecar is down or
+            # AIMTP_DEMO_ORIGIN is unset. Correct behaviour, still an outage of
+            # the thing the homepage advertises.
+            echo "  FAIL  demo session — got $STATE, wanted 200 (503 = sidecar unreachable)"
+            FAILED+=("demo session")
+          else
+            echo "  ok    demo session (200)"
+            VERDICT=$(curl -sS -c "$JAR" -b "$JAR" -X POST --max-time 25 \
+                      https://aimtp.net/api/gateway-demo/scenarios/allow 2>/dev/null \
+                      | node -e 'let b="";process.stdin.on("data",d=>b+=d).on("end",()=>{try{console.log(JSON.parse(b).last_result.decision)}catch{console.log("PARSE-FAIL")}})')
+            if [ "$VERDICT" = "ALLOW" ]; then
+              echo "  ok    signed \$25 request -> ALLOW"
+            else
+              echo "  FAIL  signed \$25 request -> $VERDICT (wanted ALLOW)"
+              FAILED+=("gateway verdict")
+            fi
+          fi
+          rm -f "$JAR"
+
+          echo
+          if [ ${#FAILED[@]} -eq 0 ]; then
+            echo "All probes passed."
+          else
+            echo "FAILED: ${FAILED[*]}"
+            exit 1
+          fi
