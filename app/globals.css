@@ -1112,6 +1112,20 @@ body {
   color: var(--color-ion);
 }
 
+/* Amber, like pending_approval, and for the same reason: both are states waiting
+   on a person. Green would read as settled and red as refused, and in-doubt is
+   neither — the whole point of the state is that nobody knows yet. */
+.audit-outcome[data-outcome="in_doubt"] {
+  color: var(--color-amber);
+}
+
+/* Resolved is an operator's finding, not the gateway's observation. It shares
+   the ion colour with `authorized` because both mark a record written about the
+   execution rather than an outcome of it. */
+.audit-outcome[data-outcome="resolved"] {
+  color: var(--color-ion);
+}
+
 /* --- code well ------------------------------------------------------------ */
 .code {
   margin-top: 34px;

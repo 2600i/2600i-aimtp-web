@@ -54,6 +54,12 @@ export default function DemoPage() {
           Each row is one call into the Gateway and the answer it returned. The decision and reason
           columns are verbatim.
         </p>
+        <p>
+          The last row is the one exception worth naming. An interruption cannot be produced by
+          calling the Gateway — a process that survives to the next line did not crash — so the
+          approval record is left in exactly the state a crash leaves it in, and the reconciler and
+          operator route are then run over it for real. The failure is staged; the answer is not.
+        </p>
         <div className="audit" style={{ marginTop: 30 }}>
           <table>
             <caption>

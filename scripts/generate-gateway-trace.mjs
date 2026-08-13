@@ -174,6 +174,34 @@ async function buildTrace(deps) {
   await gateway.receive(replayed);
   record("replay", "The same envelope, resent", "Envelope ids are single-use.", await gateway.receive(replayed));
 
+  /*
+   * An execution that was begun and never accounted for.
+   *
+   * The interruption is the one thing here that cannot be produced by calling
+   * the gateway — a process that survives to the next line did not crash. So the
+   * record is left in exactly the state a crash leaves it in, EXECUTING with a
+   * start time and no outcome, and everything after that is the real reconciler
+   * and the real operator route running over it. What is staged is the failure,
+   * not the response to it.
+   */
+  const stranded = await gateway.receive(sign({ id: "demo-in-doubt", amount: 400 }));
+  gateway.store.transitionApproval(stranded.approval_id, "PENDING_APPROVAL", {
+    decision: "EXECUTING",
+    decision_at: new Date(Date.now() - 3600_000).toISOString(),
+    approver_id: "operator-1",
+    execution_started_at: new Date(Date.now() - 3600_000).toISOString(),
+    attempts: 1,
+    idempotency_key: "demo-in-doubt",
+  });
+  const inDoubt = gateway.reconcile({ staleAfterMs: 60_000 });
+  if (inDoubt.length !== 1) throw new Error(`expected one in-doubt execution, reconciler found ${inDoubt.length}`);
+  record(
+    "resolved",
+    "Interrupted execution, settled",
+    "Found in doubt, then recorded against the operator who checked.",
+    gateway.resolveInDoubt(stranded.approval_id, "executed", "operator-1"),
+  );
+
   const conformance = runConformance();
 
   return {
