@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "brand": "node scripts/build-brand-assets.mjs",
     "trace": "node scripts/generate-gateway-trace.mjs",
-    "trace:check": "node scripts/generate-gateway-trace.mjs --check"
+    "trace:check": "node scripts/generate-gateway-trace.mjs --check",
+    "schemas": "node scripts/stage-schemas.mjs",
+    "schemas:check": "node scripts/stage-schemas.mjs --check"
   },
   "dependencies": {
     "next": "16.2.12",

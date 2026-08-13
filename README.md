@@ -3,7 +3,8 @@
 The marketing and documentation site for **AIMTP by 2600i** — the open protocol
 and the Agent Trust Gateway built on it.
 
-Canonical host: **aimtp.2600i.com**
+Canonical host: **aimtp.net**. Three path prefixes on that origin belong to the
+protocol's schemas rather than to the site — see [aimtp.net](#aimtpnet).
 
 ## Run it
 
@@ -123,20 +124,55 @@ docker compose up --build -d
 `NEXT_PUBLIC_SITE_URL` is inlined at **build** time, so changing the host needs a
 rebuild rather than a restart.
 
+Full proxy configuration, TLS and DNS are in [`docs/deployment.md`](docs/deployment.md).
+
 ## aimtp.net
 
-`aimtp.net` is deliberately untouched by this repo and does **not** redirect
-here.
+The site is canonical at `aimtp.net`. But it does **not** own that whole origin.
 
-That domain is a protocol namespace, not a vanity domain: it is the `$id` origin
-for the JSON Schemas in the protocol repo (`https://aimtp.net/schemas/…`,
-`https://aimtp.net/spec/…`, with cross-`$ref`s between them), and
-`relay.aimtp.net` is referenced as a public relay. A blanket redirect to
-`aimtp.2600i.com` would turn every schema identifier into a redirect.
+(`aimtp.2600i.com` appears in older notes as the canonical host. It was never
+deployed and has no DNS record, so nothing redirects from it — there is nothing
+to redirect.)
 
-Known gap: those `$id` URLs currently resolve to nothing. Serving the schemas at
-their own identifiers — while redirecting only the marketing paths — is the
-intended fix whenever that is picked up. It is not wired up here.
+`aimtp.net` is a protocol namespace before it is a marketing host. It is the
+`$id` origin for the protocol repo's JSON Schemas, and three path prefixes are
+therefore reserved:
+
+| Reserved | Files |
+|---|---|
+| `/schemas/` | `envelope`, `message`, `bridge-proof-v1` |
+| `/spec/` | `trust-bundle-v0.4` and the identity/revocation set it `$ref`s |
+| `/runtime/schemas/` | the `mailbox-*` set |
+
+These are identifiers, not documentation links. `spec/trust-bundle-v0.4` names
+three siblings by absolute URL, so a validator resolving a trust bundle fetches
+them over the network — and answering one of those URLs with HTML, or with a
+redirect, fails validation in someone else's process.
+
+Caddy serves them as static files from a `handle` block that is mutually
+exclusive with the reverse proxy, so this application cannot answer them however
+its routes later change, and schema resolution survives a site outage or a bad
+deploy.
+
+```sh
+npm run schemas         # stage into dist-schemas/ (needs the protocol repo)
+npm run schemas:check   # verify $ids and cross-$refs, write nothing
+rsync -a --delete --chown=root:root dist-schemas/ <host>:/srv/aimtp-schemas/
+```
+
+Nothing is committed here: the staged output is gitignored, so the protocol repo
+stays the only definition of a schema. `schemas:check` fails if a schema's `$id`
+does not match the URL it would be served at, or if an absolute `$ref` points at
+something not being published — the two ways this silently stops resolving. It
+exits 0 with a notice when the protocol repo is absent, so a checkout without a
+sibling clone still builds.
+
+See `docs/deployment.md` for the proxy configuration, including the reserved
+locations and the CORS and content-type headers validators need.
+
+`relay.aimtp.net` is separate and is not served by this repo. It is already
+deployed, already the compiled-in default in the protocol repo's CLI
+(`cli/aimtp-send.mjs`), and answers 401 without an API key.
 
 ## Known dead links (deliberate)
 

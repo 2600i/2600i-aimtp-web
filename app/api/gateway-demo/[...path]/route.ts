@@ -59,10 +59,10 @@ function rateLimited(client: string): boolean {
 }
 
 /**
- * Behind the reverse proxy that terminates TLS for aimtp.2600i.com, so the
- * left-most x-forwarded-for entry is the client. Spoofable by anyone talking to
- * that proxy directly, which is why this is a courtesy limit and the real cap
- * lives in the sidecar.
+ * Behind Caddy, which terminates TLS for aimtp.net and sets x-forwarded-for
+ * from Cloudflare's Cf-Connecting-Ip, so the left-most entry is the client.
+ * Still spoofable by anything that reaches Caddy directly, which is why this is
+ * a courtesy limit and the real cap lives in the sidecar.
  */
 function clientKey(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for");

@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   title: { default: TITLE, template: `%s — ${TITLE}` },
   description: DESCRIPTION,
   applicationName: "AIMTP",
-  // aimtp.2600i.com is canonical; every page declares it so a vanity domain or
-  // a proxy copy cannot split ranking against the real host.
+  // aimtp.net is canonical; every page declares it so a vanity domain or a
+  // proxy copy cannot split ranking against the real host.
   alternates: { canonical: "/" },
   openGraph: {
     title: TITLE,
