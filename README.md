@@ -174,21 +174,18 @@ locations and the CORS and content-type headers validators need.
 deployed, already the compiled-in default in the protocol repo's CLI
 (`cli/aimtp-send.mjs`), and answers 401 without an API key.
 
-## Known dead links (deliberate)
+## Outbound links
 
 `/docs` links into `github.com/2600i/AIMTP`, and both demo pages tell you to
-clone it. Neither works for the public yet, because **that repository is
-private**. Every documentation link 404s for anyone without access.
+clone it. That repository is **public**, and all twelve linked documents resolve
+— verified against `raw.githubusercontent.com`, not assumed.
 
-The links are written against the destination state on purpose, so the page does
-not have to be rewritten when it opens. All twelve documents they point at are
-on `main` there, including `docs/trust-gateway.md`.
+They were written against that destination state while the repository was still
+private, which is why nothing here had to be rewritten when it opened.
 
-Opening that repository is the only outstanding step. The two things that
-previously blocked it have been handled: the externally authored strategic
-briefing no longer ships with the specification, and the federation demos now
-mint their Ed25519 keys on demand rather than carrying committed ones. Its
-`docs/security.md` records what remains in that repository's history and why.
+Nothing on this site should link to a path that only exists behind
+authentication. If a link is added to a document that has not shipped yet, it is
+a dead link on a public page rather than a promise.
 
 ## Honesty constraints
 
