@@ -12,8 +12,10 @@
  * crawler, and the sort of bug that only shows up in production because it is
  * right on a laptop.
  *
- * aimtp.2600i.com is canonical. aimtp.net is a separate question and is
- * deliberately not referenced here — see README.
+ * aimtp.net is canonical and aimtp.2600i.com redirects to it. Note that the
+ * site does not own that whole origin: /schemas/, /spec/ and /runtime/schemas/
+ * are the `$id` namespace of the protocol's JSON Schemas and are served as
+ * static files by the reverse proxy, ahead of this app. See README.
  */
 const FALLBACK = "http://localhost:3000";
 
