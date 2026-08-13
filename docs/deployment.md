@@ -58,11 +58,12 @@ impersonate — to a researcher, or to someone who trusts one.
 `2600i.com` already publishes both (`v=spf1 ... ~all`, `p=quarantine`).
 `aimtp.net` publishes neither.
 
-| Name | Type | Value |
-|---|---|---|
-| `aimtp.net` | TXT | `v=spf1 -all` |
-| `_dmarc.aimtp.net` | TXT | `v=DMARC1; p=reject; rua=mailto:steve@2600i.com` |
-| `aimtp.net` | MX | `0 .` |
+| Zone | Name | Type | Value |
+|---|---|---|---|
+| `aimtp.net` | `aimtp.net` | TXT | `v=spf1 -all` |
+| `aimtp.net` | `_dmarc.aimtp.net` | TXT | `v=DMARC1; p=reject; rua=mailto:steve@2600i.com` |
+| `aimtp.net` | `aimtp.net` | MX | `0 .` |
+| **`2600i.com`** | `aimtp.net._report._dmarc` | TXT | `v=DMARC1` |
 
 `-all` and `p=reject` are hard refusals rather than the `~all`/`quarantine` pair
 on `2600i.com`. That is correct precisely *because* this domain sends nothing:
@@ -70,7 +71,21 @@ there is no legitimate mail to soft-fail, so anything claiming to be from here
 is forged and can be rejected outright. The null `MX` (RFC 7505) says the same
 thing to senders, before they compose a bounce.
 
-If `aimtp.net` ever starts sending mail, all three have to change first.
+**The fourth record is in a different zone, and is the one that is easy to
+miss.** `rua` points at a mailbox on `2600i.com` while the policy is published
+by `aimtp.net`, and RFC 7489 §7.1 requires the *receiving* domain to authorise
+that — otherwise the large receivers refuse to send the reports. Enforcement is
+unaffected either way, so the symptom is not a bounce or an error: it is an
+empty inbox, indistinguishable from nobody spoofing the domain.
+
+Its content is the literal string `v=DMARC1` and nothing else. It is an
+authorisation token, not a policy — pasting the full DMARC record there is the
+other common way this fails.
+
+Drop `rua` from the `aimtp.net` record instead if the reports will not be read.
+An unread reporting address is a maintenance item that looks like coverage.
+
+If `aimtp.net` ever starts sending mail, the first three have to change.
 
 ### CAA — who may issue certificates
 
