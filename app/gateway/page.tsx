@@ -63,6 +63,28 @@ export default function GatewayPage() {
           body, and a deployment with no tokens configured refuses those routes outright instead of
           serving them anonymously.
         </p>
+
+        <h3>When execution is interrupted</h3>
+        <p>
+          The claim writes the approval and its start time durably in one step, before the protected
+          action runs. That ordering is what makes an interruption recoverable: a record that was
+          begun is distinguishable from one that never started, so an execution which never reported
+          an outcome can be found instead of sitting in a state that reads like progress.
+        </p>
+        <p>
+          Those are marked <code className="mono">IN_DOUBT</code> and listed for an operator, who
+          records what they found in the protected system — attributed to them, because the Gateway
+          did not observe it. Nothing retries on its own. A timer that retried would be asserting the
+          action did not happen; one that completed would be asserting it did, and only someone who
+          looked can say which.
+        </p>
+        <div className="note">
+          <strong>This is not exactly-once, and no gateway alone can be.</strong> After a process
+          dies mid-call, nothing on this side knows whether the other system committed. Every handler
+          receives a stable <code className="mono">idempotency_key</code>; a protected system that
+          stores it and refuses a repeat gets exactly-once with this Gateway. One that ignores it
+          does not. That half of the contract belongs to the protected system.
+        </div>
       </section>
 
       <section id="audit">
@@ -88,10 +110,12 @@ export default function GatewayPage() {
       <section>
         <h2>Status</h2>
         <div className="note">
-          The Gateway is a developer preview. It runs locally and in a container, and the demo on
-          this site is generated from it. There is no hosted endpoint, no managed service, and no
-          production deployment behind it yet. Its protected purchase action is a deterministic
-          simulation — it performs no payment.
+          The Gateway is a developer preview. It runs locally and in a container, the recorded run
+          on this site is generated from it, and{" "}
+          <Link href="/demo/agent-trust-gateway">the interactive demo</Link> drives a real instance
+          per visitor. That instance exists to answer your requests and nothing else: there is no
+          managed service, no customer deployment, and no production traffic behind it. Its
+          protected purchase action is a deterministic simulation — it performs no payment.
         </div>
         <div className="sx-btn-row" style={{ marginTop: 34 }}>
           <Link href="/demo" className="sx-btn">

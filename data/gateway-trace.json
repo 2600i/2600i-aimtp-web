@@ -148,9 +148,65 @@
         "decision": "DENY",
         "reason": "Envelope id has already been processed"
       }
+    },
+    {
+      "key": "resolved",
+      "label": "Interrupted execution, settled",
+      "note": "Found in doubt, then recorded against the operator who checked.",
+      "response": {
+        "request_id": "demo-in-doubt",
+        "status": "completed",
+        "decision": "ALLOW",
+        "reason": "Operator confirmed the protected action took effect",
+        "approval_id": "approval-<id-5>"
+      }
     }
   ],
   "audit": [
+    {
+      "request_id": "demo-in-doubt",
+      "agent_id": "procurement-agent-1",
+      "principal_id": "demo-procurement-principal",
+      "action": "purchase.create",
+      "authentication_result": "passed",
+      "trust_result": "trusted",
+      "policy_decision": "ALLOW",
+      "final_outcome": "resolved",
+      "reason": "Operator confirmed the protected action took effect",
+      "approval_id": "approval-<id-5>",
+      "approver_id": "operator-1",
+      "event_id": "audit-<id-6>",
+      "timestamp": "<timestamp>"
+    },
+    {
+      "request_id": "demo-in-doubt",
+      "agent_id": "procurement-agent-1",
+      "principal_id": "demo-procurement-principal",
+      "action": "purchase.create",
+      "authentication_result": "passed",
+      "trust_result": "trusted",
+      "policy_decision": "ALLOW",
+      "final_outcome": "in_doubt",
+      "reason": "Execution was begun and never recorded an outcome",
+      "approval_id": "approval-<id-5>",
+      "approver_id": "operator-1",
+      "event_id": "audit-<id-7>",
+      "timestamp": "<timestamp>"
+    },
+    {
+      "request_id": "demo-in-doubt",
+      "agent_id": "procurement-agent-1",
+      "principal_id": "demo-procurement-principal",
+      "action": "purchase.create",
+      "authentication_result": "passed",
+      "trust_result": "trusted",
+      "policy_decision": "REQUIRE_APPROVAL",
+      "final_outcome": "pending_approval",
+      "reason": "Matched policy demo-purchase-over-limit",
+      "approval_id": "approval-<id-5>",
+      "event_id": "audit-<id-8>",
+      "timestamp": "<timestamp>"
+    },
     {
       "request_id": "demo-replay",
       "agent_id": "procurement-agent-1",
@@ -161,7 +217,7 @@
       "policy_decision": "DENY",
       "final_outcome": "denied",
       "reason": "Envelope id has already been processed",
-      "event_id": "audit-<id-5>",
+      "event_id": "audit-<id-9>",
       "timestamp": "<timestamp>"
     },
     {
@@ -174,7 +230,7 @@
       "policy_decision": "ALLOW",
       "final_outcome": "allowed",
       "reason": "Matched policy demo-purchase-within-limit",
-      "event_id": "audit-<id-6>",
+      "event_id": "audit-<id-10>",
       "timestamp": "<timestamp>"
     },
     {
@@ -187,7 +243,7 @@
       "policy_decision": "ALLOW",
       "final_outcome": "authorized",
       "reason": "Matched policy demo-purchase-within-limit",
-      "event_id": "audit-<id-7>",
+      "event_id": "audit-<id-11>",
       "timestamp": "<timestamp>"
     },
     {
@@ -200,7 +256,7 @@
       "policy_decision": "DENY",
       "final_outcome": "denied",
       "reason": "Signature verification failed",
-      "event_id": "audit-<id-8>",
+      "event_id": "audit-<id-12>",
       "timestamp": "<timestamp>"
     },
     {
@@ -213,7 +269,7 @@
       "policy_decision": "DENY",
       "final_outcome": "denied",
       "reason": "Unknown agent identity",
-      "event_id": "audit-<id-9>",
+      "event_id": "audit-<id-13>",
       "timestamp": "<timestamp>"
     },
     {
@@ -226,7 +282,7 @@
       "policy_decision": "DENY",
       "final_outcome": "denied",
       "reason": "Known agent is not trusted",
-      "event_id": "audit-<id-10>",
+      "event_id": "audit-<id-14>",
       "timestamp": "<timestamp>"
     },
     {
@@ -241,7 +297,7 @@
       "reason": "Rejected by operator",
       "approval_id": "approval-<id-4>",
       "approver_id": "operator-1",
-      "event_id": "audit-<id-11>",
+      "event_id": "audit-<id-15>",
       "timestamp": "<timestamp>"
     },
     {
@@ -255,7 +311,7 @@
       "final_outcome": "pending_approval",
       "reason": "Matched policy demo-purchase-over-limit",
       "approval_id": "approval-<id-4>",
-      "event_id": "audit-<id-12>",
+      "event_id": "audit-<id-16>",
       "timestamp": "<timestamp>"
     },
     {
@@ -270,7 +326,7 @@
       "reason": "Approved by operator and executed",
       "approval_id": "approval-<id-2>",
       "approver_id": "operator-1",
-      "event_id": "audit-<id-13>",
+      "event_id": "audit-<id-17>",
       "timestamp": "<timestamp>"
     },
     {
@@ -284,7 +340,7 @@
       "final_outcome": "pending_approval",
       "reason": "Matched policy demo-purchase-over-limit",
       "approval_id": "approval-<id-2>",
-      "event_id": "audit-<id-14>",
+      "event_id": "audit-<id-18>",
       "timestamp": "<timestamp>"
     },
     {
@@ -297,7 +353,7 @@
       "policy_decision": "ALLOW",
       "final_outcome": "allowed",
       "reason": "Matched policy demo-purchase-within-limit",
-      "event_id": "audit-<id-15>",
+      "event_id": "audit-<id-19>",
       "timestamp": "<timestamp>"
     },
     {
@@ -310,7 +366,7 @@
       "policy_decision": "ALLOW",
       "final_outcome": "authorized",
       "reason": "Matched policy demo-purchase-within-limit",
-      "event_id": "audit-<id-16>",
+      "event_id": "audit-<id-20>",
       "timestamp": "<timestamp>"
     }
   ],

@@ -101,9 +101,26 @@ export default function GatewayDemoPage() {
           That is a property of the Gateway you just drove, demonstrated in front of you.
         </p>
         <p>
-          It is not a claim of end-to-end or crash-safe exactly-once execution. Guaranteeing that a
-          protected action happens exactly once across a process failure needs durable idempotency
-          between the Gateway and the system it protects, and that is not implemented here.
+          It is still not a claim of end-to-end or crash-safe exactly-once execution, and cannot be.
+          If the Gateway dies part-way through a protected action, nothing on its side can know
+          whether the other system committed — that is a property of two systems talking over a
+          network, not a gap waiting to be closed.
+        </p>
+        <p>
+          What it does do is refuse to be silent about it. The authorization and its start time are
+          written durably <em>before</em> the action runs, so an execution that was begun and never
+          accounted for is found rather than left in a state that reads like progress. It is marked{" "}
+          <code className="mono">IN_DOUBT</code>, and a person records what they found in the other
+          system, against their own name. Every handler is also given a stable{" "}
+          <code className="mono">idempotency_key</code>: a protected system that stores it and
+          refuses a repeat gets exactly-once with this Gateway, and one that ignores it does not.
+          That half of the contract is not the Gateway&rsquo;s to keep.
+        </p>
+        <p>
+          The run above does not show this — an interruption is not something a button can honestly
+          stage, because a process that survives to the next step did not crash. The{" "}
+          <Link href="/demo">recorded run</Link> includes it, with the interruption staged and the
+          reconciler&rsquo;s real answer captured.
         </p>
         <p>
           The audit view shows the events this Gateway recorded for the requests it evaluated in your
