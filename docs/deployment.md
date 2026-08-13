@@ -10,14 +10,32 @@ any proxy configuration.
 |---|---|---|
 | `aimtp.net/` | this app, on loopback `127.0.0.1:3002` | this repo |
 | `aimtp.net/schemas/`, `/spec/`, `/runtime/schemas/` | static files | protocol repo |
-| `aimtp.2600i.com` | 301 to `aimtp.net` | this repo |
-| `relay.aimtp.net` | the relay | protocol repo |
+| `relay.aimtp.net` | the relay, on loopback `127.0.0.1:8787` | protocol repo |
 
-## DNS
+`aimtp.2600i.com` appears in older notes as the canonical host. It was never
+deployed and has no DNS record; `aimtp.net` is the only host this site has had.
+Nothing redirects to it, because there is nothing to redirect.
 
-`A` records for `aimtp.net` and `relay.aimtp.net` pointing at the host. Keep
-`aimtp.2600i.com` resolving — it redirects rather than retires, because it is
-in the wild.
+## DNS and the edge
+
+Both names are already `A` records in the `aimtp.net` Cloudflare zone, proxied
+(orange cloud). Standing this site up needs no DNS change.
+
+Cloudflare terminates TLS at the edge and connects to the origin over TLS again,
+so the zone must be on **Full (strict)** and Caddy must hold a certificate for
+the hostname. Until a site block exists for a name, Caddy will not answer TLS
+for it and the edge returns **525** — which is what `aimtp.net` served before
+this was configured, and is the expected symptom if a block is ever removed.
+
+The origin only accepts connections from Cloudflare's ranges: `cloudflare_only`
+in the Caddyfile aborts anything else, backed by the Hetzner Cloud Firewall
+(`/root/cf-to-hetzner-firewall.sh`). **Any new site block must import it.**
+Omitting it does not fail visibly — the site works — it just means that name can
+be reached directly on the origin IP, with the WAF, rate limiting and bot rules
+bypassed.
+
+Certificate issuance works through the orange cloud because the snippet exempts
+`/.well-known/acme-challenge/*` from the guard.
 
 ## The reserved paths
 
@@ -50,62 +68,78 @@ rsync -a --delete dist-schemas/ <host>:/srv/aimtp-schemas/
 served at, and that every absolute `$ref` points at something being published.
 Run it after any schema change in the protocol repo.
 
-## nginx
+## Caddy
 
-```nginx
-server {
-    listen 443 ssl http2;
-    server_name aimtp.net;
+The host serves everything through Caddy (`/etc/caddy/Caddyfile`). nginx is
+installed and has a stale `sites-available/aimtp.conf`, but it is disabled and
+serves nothing — editing it is a no-op, and it is the file you would reach for
+first.
 
-    # Matched before `location /` because a regex location outranks a prefix
-    # one. This ordering is load-bearing: it is what keeps the app from ever
-    # answering a schema identifier.
-    location ~ ^/(schemas|spec|runtime/schemas)/ {
-        root /srv/aimtp-schemas;
+Add one site block:
 
-        # `types {}` clears the inherited mime map so default_type applies.
-        # Without it, .json matches mime.types and is served as
-        # application/json — acceptable to most validators, but not what these
-        # documents are.
-        types { }
-        default_type application/schema+json;
+```caddy
+aimtp.net {
+    # Not optional. Without it this hostname is reachable directly on the
+    # origin IP, bypassing the WAF and rate limiting that every other site
+    # here sits behind. It fails open, so nothing looks wrong.
+    import cloudflare_only
 
+    # The protocol's schema namespace, served from disk. `handle` blocks are
+    # mutually exclusive: a request matching @schemas is answered here and
+    # never reaches the reverse proxy below, so the app cannot answer a schema
+    # identifier however its routes later change. A missing file under these
+    # prefixes is a 404 from Caddy rather than a fall-through.
+    @schemas path /schemas/* /spec/* /runtime/schemas/*
+    handle @schemas {
+        root * /srv/aimtp-schemas
+        # Caddy types .json as application/json from the extension. Acceptable
+        # to most validators, but not what these documents are.
+        header Content-Type application/schema+json
         # Validators fetch cross-origin. Without this, browser-based ones fail
-        # on the $refs while curl succeeds, which is a confusing bug to receive.
-        add_header Access-Control-Allow-Origin "*" always;
-
-        # Deliberately moderate. The -v0.4 files are immutable by name and could
-        # be cached hard, but the unversioned ones (/schemas/envelope.schema.json)
-        # cannot: a long immutable TTL on those would mean a correction takes a
-        # cache generation to reach anyone.
-        add_header Cache-Control "public, max-age=3600" always;
-
-        # No try_files and no fallback: an unknown path under these prefixes is
-        # a 404 from nginx, never a pass to the app.
+        # on the $refs while curl succeeds — a confusing bug to receive.
+        header Access-Control-Allow-Origin *
+        # Deliberately moderate. The -v0.4 files are immutable by name and
+        # could be cached hard, but the unversioned ones
+        # (/schemas/envelope.schema.json) cannot: a long TTL there would mean a
+        # correction takes a cache generation to reach anyone.
+        header Cache-Control "public, max-age=3600"
+        file_server
     }
 
-    location / {
-        proxy_pass http://127.0.0.1:3002;
-        proxy_set_header Host              $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    handle {
+        reverse_proxy 127.0.0.1:3002
     }
-}
-
-server {
-    listen 443 ssl http2;
-    server_name aimtp.2600i.com;
-    return 301 https://aimtp.net$request_uri;
 }
 ```
 
-Verify the ordering actually holds before pointing anyone at it:
+Then:
 
 ```sh
-curl -sI https://aimtp.net/schemas/envelope.schema.json | head -1   # 200
-curl -s  https://aimtp.net/spec/trust-bundle-v0.4.schema.json | head -3
-curl -sI https://aimtp.2600i.com/gateway | head -2                  # 301
+caddy validate --config /etc/caddy/Caddyfile
+systemctl reload caddy
 ```
+
+### Verify rather than assume
+
+The mutual exclusion above is the load-bearing claim, and it is cheap to check.
+Confirm it before pointing anyone at the site:
+
+```sh
+# 200, and the type must be application/schema+json — not text/html
+curl -sI https://aimtp.net/schemas/envelope.schema.json | grep -iE '^HTTP|content-type|access-control'
+
+# The cross-$ref target the trust bundle actually fetches
+curl -s https://aimtp.net/spec/identity-anchor-set-v0.4.schema.json | head -3
+
+# A missing schema must 404 from Caddy, never render the app's 404 page
+curl -s https://aimtp.net/schemas/nope.schema.json | head -5
+
+# The site itself still comes from the app
+curl -sI https://aimtp.net/ | grep -iE '^HTTP|content-type'
+```
+
+If the first command returns `text/html`, the ordering is wrong and the app is
+answering schema identifiers. Nothing else will report that.
 
 ## Build-time host
 
@@ -119,17 +153,21 @@ NEXT_PUBLIC_SITE_URL=https://aimtp.net docker compose up --build -d
 Getting this wrong is quiet rather than loud: the site works, and only
 `metadataBase`, the canonical tag and the OG image URL are wrong.
 
-## Two things to get right
+## Sharing an origin with the relay
 
-**HSTS ordering.** If the apex sends `includeSubDomains`, browsers that have
-seen it will refuse plaintext to `relay.aimtp.net` as well. Give the relay a
-working certificate *before* enabling it, or the subdomain is unreachable for
-the max-age of a header already in caches.
+`relay.aimtp.net` is a different service on the same zone, already served by its
+own Caddy block. Two consequences.
 
-**Do not put a `Domain` attribute on the demo session cookie.** `aimtp_demo_session`
-is set host-only today, which is correct. `Domain=.aimtp.net` would send it to
-`relay.aimtp.net` on every request — a session identifier crossing into a
-different trust boundary for no benefit.
+**Do not put a `Domain` attribute on the demo session cookie.**
+`aimtp_demo_session` is set host-only, which is correct. `Domain=.aimtp.net`
+would send it to `relay.aimtp.net` on every request — a session identifier
+crossing into a different trust boundary for no benefit.
+
+**HSTS `includeSubDomains` is safe here, but check before extending it.** Both
+names already have certificates, so enabling it costs nothing today. It becomes
+a trap the moment a new `*.aimtp.net` name is introduced: browsers that have
+seen the header will refuse plaintext to it before it has a certificate, for the
+remaining max-age. Give any new subdomain a working block first.
 
 ## The demo sidecar
 
@@ -138,9 +176,11 @@ server-side over the internal `aimtp-demo` Docker network. It has no
 authentication of its own, and its safety rests entirely on not being reachable
 from outside that network.
 
-It must therefore never be given a published port or a proxy `location`. Adding
+It must therefore never be given a published port or a Caddy site block. Adding
 one would expose an unauthenticated service, and nothing in the code would
-report it — the demo would simply keep working.
+report it — the demo would simply keep working. Note that the relay next to it
+*does* authenticate (it answers 401 unauthenticated); the sidecar does not, so
+the two are not interchangeable examples of "a service we expose".
 
 Unset `AIMTP_DEMO_ORIGIN` is a supported state: the page renders a labelled
 unavailable panel and points at the recorded run at `/demo`.
