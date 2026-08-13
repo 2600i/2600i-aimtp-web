@@ -23,7 +23,14 @@ const NAV: NavItem[] = [
       { label: "Gateway guide", href: `${REPO}/blob/main/docs/trust-gateway.md`, external: true },
     ],
   },
-  { label: "Demo", href: "/demo" },
+  {
+    label: "Demo",
+    href: "/demo/agent-trust-gateway",
+    children: [
+      { label: "Try the Gateway", href: "/demo/agent-trust-gateway" },
+      { label: "Recorded run", href: "/demo" },
+    ],
+  },
 ];
 
 /**
@@ -97,7 +104,8 @@ const FOOTER_LINKS = [
   { label: "Protocol", href: "/protocol" },
   { label: "Gateway", href: "/gateway" },
   { label: "Docs", href: "/docs" },
-  { label: "Demo", href: "/demo" },
+  { label: "Try the demo", href: "/demo/agent-trust-gateway" },
+  { label: "Recorded run", href: "/demo" },
   { label: "About", href: "/about" },
 ];
 
