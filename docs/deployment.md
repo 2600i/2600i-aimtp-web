@@ -10,6 +10,7 @@ any proxy configuration.
 |---|---|---|
 | `aimtp.net/` | this app, on loopback `127.0.0.1:3002` | this repo |
 | `aimtp.net/schemas/`, `/spec/`, `/runtime/schemas/` | static files | protocol repo |
+| `aimtp.net/.well-known/security.txt` | this app, a route handler | this repo |
 | `relay.aimtp.net` | the relay, on loopback `127.0.0.1:8787` | protocol repo |
 
 `aimtp.2600i.com` appears in older notes as the canonical host. It was never
@@ -36,6 +37,63 @@ bypassed.
 
 Certificate issuance works through the orange cloud because the snippet exempts
 `/.well-known/acme-challenge/*` from the guard.
+
+## DNS records that are not about routing
+
+These are applied in the Cloudflare dashboard, not by this repository. They are
+recorded here because nothing else in the system will notice they are missing —
+each one fails silently and in someone else's inbox or trust store.
+
+### Refusing mail nobody sends
+
+`aimtp.net` sends no email and has no `MX`. Without records saying so, anyone
+can send mail as `@aimtp.net` and nothing marks it as forged. That matters more
+than usual here: this domain hosts the canonical site and a published security
+policy inviting vulnerability reports, which makes it a useful name to
+impersonate — to a researcher, or to someone who trusts one.
+
+`2600i.com` already publishes both (`v=spf1 ... ~all`, `p=quarantine`).
+`aimtp.net` publishes neither.
+
+| Name | Type | Value |
+|---|---|---|
+| `aimtp.net` | TXT | `v=spf1 -all` |
+| `_dmarc.aimtp.net` | TXT | `v=DMARC1; p=reject; rua=mailto:steve@2600i.com` |
+| `aimtp.net` | MX | `0 .` |
+
+`-all` and `p=reject` are hard refusals rather than the `~all`/`quarantine` pair
+on `2600i.com`. That is correct precisely *because* this domain sends nothing:
+there is no legitimate mail to soft-fail, so anything claiming to be from here
+is forged and can be rejected outright. The null `MX` (RFC 7505) says the same
+thing to senders, before they compose a bounce.
+
+If `aimtp.net` ever starts sending mail, all three have to change first.
+
+### CAA — who may issue certificates
+
+Neither zone publishes `CAA`, so any CA may issue for these names. Two issuers
+are actually in use: Cloudflare at the edge, Let's Encrypt at the origin via
+Caddy.
+
+| Name | Type | Value |
+|---|---|---|
+| `aimtp.net` | CAA | `0 issue "letsencrypt.org"` |
+| `aimtp.net` | CAA | `0 issue "pki.goog"` |
+| `aimtp.net` | CAA | `0 issue "digicert.com"` |
+| `aimtp.net` | CAA | `0 issuewild ";"` |
+| `aimtp.net` | CAA | `0 iodef "mailto:steve@2600i.com"` |
+
+Cloudflare rotates which CA backs its edge certificates, so the set has to cover
+its issuers rather than only Let's Encrypt — a CAA record that omits the live
+edge CA breaks renewal, and it breaks it quietly, weeks after the change. Verify
+against Cloudflare's current list before applying, and drop `issuewild` if a
+wildcard is ever needed.
+
+### DNSSEC
+
+Neither zone is signed. Cloudflare enables it per zone and it is a one-time
+action; the only cost is that the registrar has to carry the `DS` record, so it
+is not purely a dashboard toggle.
 
 ## The reserved paths
 
