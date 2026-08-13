@@ -157,7 +157,7 @@ deploy.
 ```sh
 npm run schemas         # stage into dist-schemas/ (needs the protocol repo)
 npm run schemas:check   # verify $ids and cross-$refs, write nothing
-rsync -a --delete dist-schemas/ <host>:/srv/aimtp-schemas/
+rsync -a --delete --chown=root:root dist-schemas/ <host>:/srv/aimtp-schemas/
 ```
 
 Nothing is committed here: the staged output is gitignored, so the protocol repo

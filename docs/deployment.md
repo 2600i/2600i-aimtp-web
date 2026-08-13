@@ -61,7 +61,7 @@ Stage them from the protocol repo:
 
 ```sh
 npm run schemas
-rsync -a --delete dist-schemas/ <host>:/srv/aimtp-schemas/
+rsync -a --delete --chown=root:root dist-schemas/ <host>:/srv/aimtp-schemas/
 ```
 
 `npm run schemas:check` verifies that each `$id` matches the URL it will be

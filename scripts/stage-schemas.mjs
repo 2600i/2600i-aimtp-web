@@ -127,4 +127,12 @@ for (const namespace of NAMESPACES) {
   const count = staged.filter((file) => file.rel.startsWith(`${namespace}/`)).length;
   console.log(`  /${namespace}/  ${count}`);
 }
-console.log(`\nDeploy with:\n  rsync -a --delete dist-schemas/ <host>:/srv/aimtp-schemas/`);
+/*
+ * --chown is not decoration. Plain `-a` preserves the *local* uid, which on a
+ * macOS checkout is 501 and exists on no Linux host, so the deployed tree ends
+ * up owned by a phantom user. It stays world-readable and Caddy still serves
+ * it, which is precisely why this would go unnoticed.
+ */
+console.log(
+  `\nDeploy with:\n  rsync -a --delete --chown=root:root dist-schemas/ <host>:/srv/aimtp-schemas/`,
+);
