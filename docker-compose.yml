@@ -6,13 +6,13 @@ services:
       args:
         # Canonical host. Baked into the bundle at build time, so changing it
         # requires a rebuild, not just a restart.
-        NEXT_PUBLIC_SITE_URL: "${NEXT_PUBLIC_SITE_URL:-https://aimtp.2600i.com}"
+        NEXT_PUBLIC_SITE_URL: "${NEXT_PUBLIC_SITE_URL:-https://aimtp.net}"
     # Loopback only: TLS and the public hostname are the reverse proxy's job,
     # matching how the sibling 2600i sites are served.
     ports:
       - "127.0.0.1:3002:3000"
     environment:
-      NEXT_PUBLIC_SITE_URL: "${NEXT_PUBLIC_SITE_URL:-https://aimtp.2600i.com}"
+      NEXT_PUBLIC_SITE_URL: "${NEXT_PUBLIC_SITE_URL:-https://aimtp.net}"
       # Backs /demo/agent-trust-gateway. Server-side only, read at run time, so
       # it can be set without a rebuild. Empty means the page renders its
       # "unavailable" state and points at the recorded run — which is the
