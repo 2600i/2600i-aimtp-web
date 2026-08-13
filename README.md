@@ -124,7 +124,13 @@ docker compose up --build -d
 `NEXT_PUBLIC_SITE_URL` is inlined at **build** time, so changing the host needs a
 rebuild rather than a restart.
 
-Full proxy configuration, TLS and DNS are in [`docs/deployment.md`](docs/deployment.md).
+Two documents cover the rest:
+
+- [`docs/runbook.md`](docs/runbook.md) — rebuilding the host from nothing, the
+  routine deploys, and what each symptom means. Start here to *do* something.
+- [`docs/deployment.md`](docs/deployment.md) — proxy configuration, TLS, DNS,
+  and why each piece is shaped the way it is. Read this when a step in the
+  runbook looks arbitrary.
 
 ## aimtp.net
 

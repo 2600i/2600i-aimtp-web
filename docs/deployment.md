@@ -1,8 +1,11 @@
 # Deployment
 
-How `aimtp.net` is served. The site is one of three things on that origin, and
-it is the least constrained of them — read the schema section before changing
-any proxy configuration.
+How `aimtp.net` is served, and why each piece is shaped the way it is. The site
+is one of three things on that origin, and it is the least constrained of them —
+read the schema section before changing any proxy configuration.
+
+For the order to do things in — rebuilding the host, routine deploys, what a
+given symptom means — see [`runbook.md`](runbook.md).
 
 ## What lives where
 
