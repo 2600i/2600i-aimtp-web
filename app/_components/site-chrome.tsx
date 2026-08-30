@@ -130,7 +130,7 @@ export function SiteFooter() {
       </div>
 
       <span className="sx-copyright">
-        © {new Date().getFullYear()} <span className="brandcase">2600i</span>
+        © {new Date().getFullYear()} <span className="brandcase">2600i</span> LLC
       </span>
     </footer>
   );
