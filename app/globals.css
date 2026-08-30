@@ -1242,9 +1242,15 @@ body {
  * accent in the mark. Uppercase runs like the footer and the bar would render
  * it "2600I", so the name opts out of the transform wherever it appears inside
  * one.
+ *
+ * `!important` because the contextual rules out-specify a plain class and win
+ * without it: `.sx-footer span` is 0-1-1 against this 0-1-0, so the footer read
+ * "© 2026 2600I" until this was added. That matters more now than it did as a
+ * brand nit — the footer names the legal entity, and "2600I LLC" is not the
+ * name. 2600i.com carries the same rule for the same reason.
  */
 .brandcase {
-  text-transform: none;
+  text-transform: none !important;
 }
 
 /* ===========================================================================

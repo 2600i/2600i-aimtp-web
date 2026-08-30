@@ -5,7 +5,7 @@ import { PageShell } from "../_components/page-shell";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "AIMTP is a project of 2600i: an open protocol for trusted interaction between AI agents, and the Agent Trust Gateway built on top of it.",
+    "AIMTP is a project of 2600i LLC: an open protocol for trusted interaction between AI agents, and the Agent Trust Gateway built on top of it.",
   alternates: { canonical: "/about" },
 };
 
@@ -13,8 +13,8 @@ export default function AboutPage() {
   return (
     <PageShell
       eyebrow="About"
-      title="AIMTP is a project of 2600i"
-      intro="2600i builds systems that turn opportunities into things that actually run. AIMTP is the protocol layer of that work, and the Agent Trust Gateway is its first enforcement product."
+      title="AIMTP is a project of 2600i LLC"
+      intro="2600i LLC builds systems that turn opportunities into things that actually run. AIMTP is the protocol layer of that work, and the Agent Trust Gateway is its first enforcement product."
       scene="scene-orb"
     >
       <section>
@@ -61,10 +61,17 @@ export default function AboutPage() {
       </section>
 
       <section>
-        <h2>2600i</h2>
+        <h2>2600i LLC</h2>
         <p>
-          AIMTP sits alongside 2600i&rsquo;s other work rather than apart from it: same entity, same
-          design system, same engineering conventions.
+          AIMTP is published by 2600i LLC, a Florida limited liability company, and sits alongside
+          its other work rather than apart from it: same entity, same design system, same
+          engineering conventions.
+        </p>
+        <p>
+          This page describes aimtp.net and the AIMTP protocol only. Other 2600i products and
+          sites carry their own terms and privacy policies. Questions about the protocol or this
+          site go to <a href="mailto:ask@2600i.com">ask@2600i.com</a>; legal and entity questions
+          to <a href="mailto:2600intel@pm.me">2600intel@pm.me</a>.
         </p>
         <div className="sx-btn-row" style={{ marginTop: 30 }}>
           <a href="https://2600i.com" className="sx-btn" target="_blank" rel="noreferrer">
