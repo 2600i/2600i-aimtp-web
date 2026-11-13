@@ -77,13 +77,16 @@ protocol repo and validates before copying:
 ```sh
 cd <path>/2600i-aimtp-web
 npm run schemas
-rsync -a --delete --chown=root:root dist-schemas/ hetzner:/srv/aimtp-schemas/
+rsync -a --delete --chown=root:root --rsync-path='sudo rsync' dist-schemas/ ovh:/srv/aimtp-schemas/
 ```
 
 `--chown` is not decoration: plain `-a` preserves the local uid, which from a
 macOS checkout is `501` and exists on no Linux host. The tree stays
 world-readable and Caddy still serves it, which is why the mistake survives
 unnoticed.
+
+`--rsync-path='sudo rsync'` is there because the `ovh` alias logs in as
+`ubuntu`, not root, and only root can `--chown` to root.
 
 Expect **13** files. `npm run schemas:check` fails if a schema's `$id` does not
 match the URL it would be served at, or if a cross-`$ref` points at something
@@ -199,21 +202,26 @@ committed fixture drifts.
 
 ### Locked out over SSH
 
-This has happened once and was never explained. Everything inside the VM was
-clean — no iptables rules, no fail2ban ban, no OOM, no socket trigger limit, no
-conntrack exhaustion, and **the kernel logged nothing at all** during the
+This happened once, on the Hetzner host (deleted on 2026-11-02), and was
+never explained. Everything inside the VM was clean — no iptables rules, no
+fail2ban ban, no OOM, no socket trigger limit, no conntrack exhaustion, and **the kernel logged nothing at all** during the
 outage, meaning the packets never reached the machine. That points at the
 Hetzner Cloud Firewall, which is applied at the hypervisor and is invisible from
 inside.
 
-Check, in order:
+On the OVH host (`vps-f71da429`) the equivalents are:
 
-1. **Hetzner Cloud → Firewalls** → the firewall on this server → inbound port 22
-2. **Hetzner Cloud → the server → Console** — VNC, bypasses the network entirely
+1. **fail2ban** — unlike the Hetzner box, this host runs it, so a ban is now
+   the first suspect, not the last
+2. **OVHcloud Control Panel → the VPS** — any network firewall applied there,
+   inbound port 22
+3. **OVHcloud Control Panel → the VPS → KVM console** — bypasses the network
+   entirely
 
-The console needs a root password. If none is set, that fallback does not exist
-when you need it. Set one and log in once to confirm — an untested recovery path
-is not a recovery path.
+The console needs a local password. One was set and tested on the Hetzner box;
+whether one exists on the OVH host is not recorded. If none is set, that
+fallback does not exist when you need it — an untested recovery path is not a
+recovery path.
 
 **That password is deliberately useless over SSH.** `sshd` runs with
 `passwordauthentication no` and `permitrootlogin without-password`, so port 22

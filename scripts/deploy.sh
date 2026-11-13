@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# Deploy 2600i-aimtp-web on the Hetzner host.
+# Deploy 2600i-aimtp-web on the OVH host.
 #
-#   ssh hetzner
+#   ssh ovh
 #   cd /opt/2600i-aimtp-web && bash scripts/deploy.sh
 #
 # Safe to re-run. Exits non-zero without touching the running container if the

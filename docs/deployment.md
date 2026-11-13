@@ -32,8 +32,11 @@ for it and the edge returns **525** — which is what `aimtp.net` served before
 this was configured, and is the expected symptom if a block is ever removed.
 
 The origin only accepts connections from Cloudflare's ranges: `cloudflare_only`
-in the Caddyfile aborts anything else, backed by the Hetzner Cloud Firewall
-(`/root/cf-to-hetzner-firewall.sh`). **Any new site block must import it.**
+in the Caddyfile aborts anything else. On the old Hetzner host that was backed
+by the Hetzner Cloud Firewall (`/root/cf-to-hetzner-firewall.sh`); that went
+with the server, deleted on 2026-11-02, and no network-edge equivalent is recorded
+for the OVH host yet, so treat `cloudflare_only` as the only layer.
+**Any new site block must import it.**
 Omitting it does not fail visibly — the site works — it just means that name can
 be reached directly on the origin IP, with the WAF, rate limiting and bot rules
 bypassed.
